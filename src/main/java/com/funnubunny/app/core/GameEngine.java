@@ -7,18 +7,23 @@ import com.funnubunny.app.graphics.Mesh;
 import com.funnubunny.app.graphics.ShaderProgram;
 import com.funnubunny.app.quest.Dialogue;
 import com.funnubunny.app.quest.DialogueManager;
+import com.funnubunny.app.quest.QuestManager;
+import com.funnubunny.app.quest.QuestState;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.FPSAnimator;
+import org.joml.Matrix4f;
 
 import java.util.List;
 
 public class GameEngine implements GLEventListener {
 
-    public static final int WIDTH = 1280;
-    public static final int HEIGHT = 720;
-    public static final int FPS = 60;
+    private static final int WIDTH = 1280;
+    private static final int HEIGHT = 720;
+    private static final int FPS = 60;
+
+    private static final float INTERACTION_DISTANCE = 60f;
 
     private GLWindow window;
     private FPSAnimator animator;
@@ -33,6 +38,7 @@ public class GameEngine implements GLEventListener {
     private NPC npc;
 
     private DialogueManager dialogueManager;
+    private QuestManager questManager;
 
     public void start() {
         initializeWindow();
@@ -94,6 +100,7 @@ public class GameEngine implements GLEventListener {
         npc.setMesh(quad);
 
         dialogueManager = new DialogueManager();
+        questManager = new QuestManager();
     }
 
     @Override
@@ -111,11 +118,21 @@ public class GameEngine implements GLEventListener {
 
         player.update();
 
-        if (Input.isKeyPressed(KeyEvent.VK_E)) {
-            dialogueManager.start(npc.getDialogue());
+        float dx = player.getPosition().x - npc.getPosition().x;
+        float dy = player.getPosition().y - npc.getPosition().y;
+
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+        boolean inRange = distance < INTERACTION_DISTANCE;
+
+        if (inRange && Input.isKeyPressed(KeyEvent.VK_E)) {
+            if (!dialogueManager.isActive()) {
+                dialogueManager.start(npc.getDialogue());
+                questManager.setState(QuestState.TALKED_TO_KEEPER);
+            }
         }
 
-        if (Input.isKeyPressed(KeyEvent.VK_SPACE)) {
+        if (dialogueManager.isActive() && Input.isKeyPressed(KeyEvent.VK_SPACE)) {
             dialogueManager.next();
         }
 

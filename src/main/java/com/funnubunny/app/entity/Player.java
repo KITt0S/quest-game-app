@@ -3,6 +3,7 @@ package com.funnubunny.app.entity;
 import com.funnubunny.app.core.Input;
 import com.funnubunny.app.core.Time;
 import com.jogamp.newt.event.KeyEvent;
+import org.joml.Vector2f;
 
 public class Player extends Entity {
     private float speed = 200f;
@@ -30,5 +31,9 @@ public class Player extends Entity {
         if (Input.isKeyPressed(KeyEvent.VK_D)) {
             transform.translate(speed * dt, 0);
         }
+    }
+
+    public Vector2f getPosition() {
+        return transform.getPosition();
     }
 }

@@ -2,6 +2,7 @@ package com.funnubunny.app.entity;
 
 import com.funnubunny.app.quest.Dialogue;
 import com.funnubunny.app.quest.Interactable;
+import org.joml.Vector2f;
 
 public class NPC extends Entity implements Interactable {
     private final String name;
@@ -26,5 +27,9 @@ public class NPC extends Entity implements Interactable {
 
     public Dialogue getDialogue() {
         return dialogue;
+    }
+
+    public Vector2f getPosition() {
+        return transform.getPosition();
     }
 }
