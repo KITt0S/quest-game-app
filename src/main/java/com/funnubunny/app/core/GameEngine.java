@@ -1,5 +1,6 @@
 package com.funnubunny.app.core;
 
+import com.funnubunny.app.graphics.Mesh;
 import com.funnubunny.app.graphics.ShaderProgram;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.opengl.GLWindow;
@@ -14,9 +15,11 @@ public class GameEngine implements GLEventListener {
 
     private GLWindow window;
     private FPSAnimator animator;
-    private ShaderProgram shaderProgram;
 
     private final Input input = new Input();
+
+    private ShaderProgram shaderProgram;
+    private Mesh quad;
 
     public void start() {
         initializeWindow();
@@ -44,12 +47,29 @@ public class GameEngine implements GLEventListener {
         GL3 gl = drawable.getGL().getGL3();
         gl.glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         gl.glClearColor(0.04f, 0.05f, 0.08f, 1.0f);
-        shaderProgram = new ShaderProgram(gl, "/shaders/default.vert", "/shaders/default.frag");
         System.out.println("====================================");
         System.out.println("OpenGL INITIALIZED");
         System.out.println("Version : " + gl.glGetString(GL3.GL_VERSION));
         System.out.println("Renderer: " + gl.glGetString(GL3.GL_RENDERER));
         System.out.println("====================================");
+
+        shaderProgram = new ShaderProgram(gl, "/shaders/default.vert", "/shaders/default.frag");
+
+        // QUAD (2 triangles)
+        float[] vertices = {
+                // position
+                -0.5f,  0.5f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+                0.5f,  0.5f, 0.0f
+        };
+
+        int[] indices = {
+                0, 1, 2,
+                2, 3, 0
+        };
+
+        quad = new Mesh(gl, vertices, indices);
     }
 
     @Override
@@ -64,15 +84,12 @@ public class GameEngine implements GLEventListener {
         if (Input.isKeyPressed(KeyEvent.VK_ESCAPE)) {
             stop();
         }
-
-        if (Input.isKeyPressed(KeyEvent.VK_W)) {
-            System.out.println("Moving up");
-        }
     }
 
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         shaderProgram.use(gl);
+        quad.render(gl);
         shaderProgram.detach(gl);
     }
 
@@ -97,6 +114,10 @@ public class GameEngine implements GLEventListener {
     @Override
     public void dispose(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
+
+        if (quad != null) {
+            quad.delete(gl);
+        }
 
         if (shaderProgram != null) {
             shaderProgram.delete(gl);
