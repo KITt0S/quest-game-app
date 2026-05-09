@@ -1,4 +1,4 @@
-package com.funnubunny.app;
+package com.funnubunny.app.core;
 
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
