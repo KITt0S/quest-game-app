@@ -9,6 +9,8 @@ import com.funnubunny.app.quest.Dialogue;
 import com.funnubunny.app.quest.DialogueManager;
 import com.funnubunny.app.quest.QuestManager;
 import com.funnubunny.app.quest.QuestState;
+import com.funnubunny.app.ui.DialogueBox;
+import com.funnubunny.app.ui.HUD;
 import com.funnubunny.app.world.Lighthouse;
 import com.funnubunny.app.world.WorldState;
 import com.jogamp.newt.event.KeyEvent;
@@ -39,9 +41,11 @@ public class GameEngine implements GLEventListener {
     private NPC npc;
     private Lighthouse lighthouse;
 
-    private DialogueManager dialogueManager;
     private QuestManager questManager;
     private WorldState worldState;
+    
+    private DialogueBox dialogueBox;
+    private HUD hud;
 
     public void start() {
         initializeWindow();
@@ -106,9 +110,11 @@ public class GameEngine implements GLEventListener {
         lighthouse.setMesh(quad);
         lighthouse.getTransform().setPosition(200, 0);
 
-        dialogueManager = new DialogueManager();
         questManager = new QuestManager();
         worldState = new WorldState();
+
+        dialogueBox = new DialogueBox();
+        hud = new HUD();
     }
 
     @Override
@@ -131,17 +137,20 @@ public class GameEngine implements GLEventListener {
 
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-        boolean inRange = distance < INTERACTION_DISTANCE;
+        boolean canInteract = distance < INTERACTION_DISTANCE;
 
-        if (inRange && Input.isKeyPressed(KeyEvent.VK_E)) {
-            if (!dialogueManager.isActive()) {
-                dialogueManager.start(npc.getDialogue());
+        hud.setCanInteract(canInteract);
+        hud.setQuestState(questManager.getState());
+
+        if (canInteract && Input.isKeyPressed(KeyEvent.VK_E)) {
+            if (!dialogueBox.isActive()) {
+                dialogueBox.show(npc.getDialogue());
                 questManager.setState(QuestState.TALKED_TO_KEEPER);
             }
         }
 
-        if (dialogueManager.isActive() && Input.isKeyPressed(KeyEvent.VK_SPACE)) {
-            dialogueManager.next();
+        if (dialogueBox.isActive() && Input.isKeyPressed(KeyEvent.VK_SPACE)) {
+            dialogueBox.next();
         }
 
         worldState.updateFromQuest(questManager.getState());
@@ -160,6 +169,8 @@ public class GameEngine implements GLEventListener {
         npc.render(gl, shader, camera);
         lighthouse.render(gl, shader, camera);
         shader.detach(gl);
+        dialogueBox.render(gl);
+        hud.render(gl);
     }
 
     private void stop() {
