@@ -1,5 +1,6 @@
 package com.funnubunny.app.core;
 
+import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.graphics.Camera2D;
 import com.funnubunny.app.graphics.Mesh;
 import com.funnubunny.app.graphics.ShaderProgram;
@@ -19,9 +20,10 @@ public class GameEngine implements GLEventListener {
 
     private final Input input = new Input();
 
-    private ShaderProgram shaderProgram;
+    private ShaderProgram shader;
     private Mesh quad;
     private Camera2D camera;
+    private Player player;
 
     public void start() {
         initializeWindow();
@@ -55,15 +57,15 @@ public class GameEngine implements GLEventListener {
         System.out.println("Renderer: " + gl.glGetString(GL3.GL_RENDERER));
         System.out.println("====================================");
 
-        shaderProgram = new ShaderProgram(gl, "/shaders/default.vert", "/shaders/default.frag");
+        shader = new ShaderProgram(gl, "/shaders/default.vert", "/shaders/default.frag");
 
         camera = new Camera2D(WIDTH, HEIGHT);
 
         float[] vertices = {
-                -50f,  50f, 0f,
-                -50f, -50f, 0f,
-                50f, -50f, 0f,
-                50f,  50f, 0f
+                -25f,  25f, 0f,
+                -25f, -25f, 0f,
+                25f, -25f, 0f,
+                25f,  25f, 0f
         };
 
         int[] indices = {
@@ -72,6 +74,8 @@ public class GameEngine implements GLEventListener {
         };
 
         quad = new Mesh(gl, vertices, indices);
+        player = new Player();
+        player.setMesh(quad);
     }
 
     @Override
@@ -87,31 +91,15 @@ public class GameEngine implements GLEventListener {
             stop();
         }
 
-        if (Input.isKeyPressed(KeyEvent.VK_W)) {
-            camera.move(0, 200 * Time.getDeltaTime());
-        }
+        player.update();
 
-        if (Input.isKeyPressed(KeyEvent.VK_S)) {
-            camera.move(0, -200 * Time.getDeltaTime());
-        }
-
-        if (Input.isKeyPressed(KeyEvent.VK_A)) {
-            camera.move(-200 * Time.getDeltaTime(), 0);
-        }
-
-        if (Input.isKeyPressed(KeyEvent.VK_D)) {
-            camera.move(200 * Time.getDeltaTime(), 0);
-        }
-
+        camera.setPosition(player.getTransform().getPosition().x, player.getTransform().getPosition().y);
         camera.update();
     }
 
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
-        shaderProgram.use(gl);
-        shaderProgram.setUniformMatrix4f(gl, "uProjectionView", camera.getProjectionView());
-        quad.render(gl);
-        shaderProgram.detach(gl);
+        player.render(gl, shader, camera);
     }
 
     private void stop() {
@@ -140,8 +128,8 @@ public class GameEngine implements GLEventListener {
             quad.delete(gl);
         }
 
-        if (shaderProgram != null) {
-            shaderProgram.delete(gl);
+        if (shader != null) {
+            shader.delete(gl);
         }
 
         if (animator != null) {
