@@ -1,5 +1,6 @@
 package com.funnubunny.app.core;
 
+import com.funnubunny.app.graphics.ShaderProgram;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
@@ -13,6 +14,7 @@ public class GameEngine implements GLEventListener {
 
     private GLWindow window;
     private FPSAnimator animator;
+    private ShaderProgram shaderProgram;
 
     private final Input input = new Input();
 
@@ -42,6 +44,7 @@ public class GameEngine implements GLEventListener {
         GL3 gl = drawable.getGL().getGL3();
         gl.glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         gl.glClearColor(0.04f, 0.05f, 0.08f, 1.0f);
+        shaderProgram = new ShaderProgram(gl, "/shaders/default.vert", "/shaders/default.frag");
         System.out.println("====================================");
         System.out.println("OpenGL INITIALIZED");
         System.out.println("Version : " + gl.glGetString(GL3.GL_VERSION));
@@ -69,6 +72,8 @@ public class GameEngine implements GLEventListener {
 
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
+        shaderProgram.use(gl);
+        shaderProgram.detach(gl);
     }
 
     private void stop() {
@@ -91,6 +96,12 @@ public class GameEngine implements GLEventListener {
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
+        GL3 gl = drawable.getGL().getGL3();
+
+        if (shaderProgram != null) {
+            shaderProgram.delete(gl);
+        }
+
         if (animator != null && animator.isStarted()) {
             animator.stop();
         }
