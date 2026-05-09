@@ -1,5 +1,6 @@
 package com.funnubunny.app.core;
 
+import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.FPSAnimator;
@@ -13,8 +14,11 @@ public class GameEngine implements GLEventListener {
     private GLWindow window;
     private FPSAnimator animator;
 
+    private final Input input = new Input();
+
     public void start() {
         initializeWindow();
+        Time.init();
         animator = new FPSAnimator(window, TARGET_FPS, true);
         animator.start();
     }
@@ -30,6 +34,7 @@ public class GameEngine implements GLEventListener {
         window.setResizable(true);
         window.setVisible(true);
         window.addGLEventListener(this);
+        window.addKeyListener(input);
     }
 
     @Override
@@ -47,15 +52,35 @@ public class GameEngine implements GLEventListener {
     @Override
     public void display(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
+        Time.update();
         update();
         render(gl);
     }
 
     private void update() {
+        if (Input.isKeyPressed(KeyEvent.VK_ESCAPE)) {
+            stop();
+        }
+
+        if (Input.isKeyPressed(KeyEvent.VK_W)) {
+            System.out.println("Moving up");
+        }
     }
 
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
+    }
+
+    private void stop() {
+        if (animator != null) {
+            animator.stop();
+        }
+
+        if (window != null) {
+            window.destroy();
+        }
+
+        System.exit(0);
     }
 
     @Override
