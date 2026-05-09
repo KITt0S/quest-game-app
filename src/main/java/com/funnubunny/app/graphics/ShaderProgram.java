@@ -117,4 +117,9 @@ public class ShaderProgram {
         matrix.get(buffer);
         gl.glUniformMatrix4fv(location, 1, false, buffer, 0);
     }
+
+    public void setUniformBool(GL3 gl, String name, boolean value) {
+        int location = gl.glGetUniformLocation(programId, name);
+        gl.glUniform1i(location, value ? 1 : 0);
+    }
 }

@@ -9,11 +9,12 @@ import com.funnubunny.app.quest.Dialogue;
 import com.funnubunny.app.quest.DialogueManager;
 import com.funnubunny.app.quest.QuestManager;
 import com.funnubunny.app.quest.QuestState;
+import com.funnubunny.app.world.Lighthouse;
+import com.funnubunny.app.world.WorldState;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.FPSAnimator;
-import org.joml.Matrix4f;
 
 import java.util.List;
 
@@ -36,9 +37,11 @@ public class GameEngine implements GLEventListener {
 
     private Player player;
     private NPC npc;
+    private Lighthouse lighthouse;
 
     private DialogueManager dialogueManager;
     private QuestManager questManager;
+    private WorldState worldState;
 
     public void start() {
         initializeWindow();
@@ -99,8 +102,13 @@ public class GameEngine implements GLEventListener {
                         "Find the power source.")));
         npc.setMesh(quad);
 
+        lighthouse = new Lighthouse();
+        lighthouse.setMesh(quad);
+        lighthouse.getTransform().setPosition(200, 0);
+
         dialogueManager = new DialogueManager();
         questManager = new QuestManager();
+        worldState = new WorldState();
     }
 
     @Override
@@ -136,6 +144,10 @@ public class GameEngine implements GLEventListener {
             dialogueManager.next();
         }
 
+        worldState.updateFromQuest(questManager.getState());
+
+        lighthouse.setActive(worldState.isLighthouseOn());
+
         camera.setPosition(player.getTransform().getPosition().x, player.getTransform().getPosition().y);
         camera.update();
     }
@@ -143,8 +155,10 @@ public class GameEngine implements GLEventListener {
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         shader.use(gl);
+        shader.setUniformBool(gl, "uLighthouseOn", worldState.isLighthouseOn());
         player.render(gl, shader, camera);
         npc.render(gl, shader, camera);
+        lighthouse.render(gl, shader, camera);
         shader.detach(gl);
     }
 
