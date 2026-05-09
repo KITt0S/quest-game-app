@@ -1,13 +1,18 @@
 package com.funnubunny.app.core;
 
+import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.graphics.Camera2D;
 import com.funnubunny.app.graphics.Mesh;
 import com.funnubunny.app.graphics.ShaderProgram;
+import com.funnubunny.app.quest.Dialogue;
+import com.funnubunny.app.quest.DialogueManager;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.FPSAnimator;
+
+import java.util.List;
 
 public class GameEngine implements GLEventListener {
 
@@ -23,7 +28,11 @@ public class GameEngine implements GLEventListener {
     private ShaderProgram shader;
     private Mesh quad;
     private Camera2D camera;
+
     private Player player;
+    private NPC npc;
+
+    private DialogueManager dialogueManager;
 
     public void start() {
         initializeWindow();
@@ -62,10 +71,10 @@ public class GameEngine implements GLEventListener {
         camera = new Camera2D(WIDTH, HEIGHT);
 
         float[] vertices = {
-                -25f,  25f, 0f,
+                -25f, 25f, 0f,
                 -25f, -25f, 0f,
                 25f, -25f, 0f,
-                25f,  25f, 0f
+                25f, 25f, 0f
         };
 
         int[] indices = {
@@ -76,6 +85,15 @@ public class GameEngine implements GLEventListener {
         quad = new Mesh(gl, vertices, indices);
         player = new Player();
         player.setMesh(quad);
+
+        npc = new NPC("Old Keeper",
+                new Dialogue(List.of(
+                        "The lighthouse went dark...",
+                        "Something is wrong in the fog.",
+                        "Find the power source.")));
+        npc.setMesh(quad);
+
+        dialogueManager = new DialogueManager();
     }
 
     @Override
@@ -93,13 +111,24 @@ public class GameEngine implements GLEventListener {
 
         player.update();
 
+        if (Input.isKeyPressed(KeyEvent.VK_E)) {
+            dialogueManager.start(npc.getDialogue());
+        }
+
+        if (Input.isKeyPressed(KeyEvent.VK_SPACE)) {
+            dialogueManager.next();
+        }
+
         camera.setPosition(player.getTransform().getPosition().x, player.getTransform().getPosition().y);
         camera.update();
     }
 
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
+        shader.use(gl);
         player.render(gl, shader, camera);
+        npc.render(gl, shader, camera);
+        shader.detach(gl);
     }
 
     private void stop() {
