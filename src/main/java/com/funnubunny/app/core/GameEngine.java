@@ -1,5 +1,6 @@
 package com.funnubunny.app.core;
 
+import com.funnubunny.app.graphics.Camera2D;
 import com.funnubunny.app.graphics.Mesh;
 import com.funnubunny.app.graphics.ShaderProgram;
 import com.jogamp.newt.event.KeyEvent;
@@ -9,9 +10,9 @@ import com.jogamp.opengl.util.FPSAnimator;
 
 public class GameEngine implements GLEventListener {
 
-    public static final int WINDOW_WIDTH = 1280;
-    public static final int WINDOW_HEIGHT = 720;
-    public static final int TARGET_FPS = 60;
+    public static final int WIDTH = 1280;
+    public static final int HEIGHT = 720;
+    public static final int FPS = 60;
 
     private GLWindow window;
     private FPSAnimator animator;
@@ -20,11 +21,12 @@ public class GameEngine implements GLEventListener {
 
     private ShaderProgram shaderProgram;
     private Mesh quad;
+    private Camera2D camera;
 
     public void start() {
         initializeWindow();
         Time.init();
-        animator = new FPSAnimator(window, TARGET_FPS, true);
+        animator = new FPSAnimator(window, FPS, true);
         animator.start();
     }
 
@@ -34,7 +36,7 @@ public class GameEngine implements GLEventListener {
         capabilities.setHardwareAccelerated(true);
         capabilities.setOnscreen(true);
         window = GLWindow.create(capabilities);
-        window.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        window.setSize(WIDTH, HEIGHT);
         window.setTitle("The Last Lighthouse");
         window.setResizable(true);
         window.setVisible(true);
@@ -45,7 +47,7 @@ public class GameEngine implements GLEventListener {
     @Override
     public void init(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
-        gl.glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        gl.glViewport(0, 0, WIDTH, HEIGHT);
         gl.glClearColor(0.04f, 0.05f, 0.08f, 1.0f);
         System.out.println("====================================");
         System.out.println("OpenGL INITIALIZED");
@@ -55,13 +57,13 @@ public class GameEngine implements GLEventListener {
 
         shaderProgram = new ShaderProgram(gl, "/shaders/default.vert", "/shaders/default.frag");
 
-        // QUAD (2 triangles)
+        camera = new Camera2D(WIDTH, HEIGHT);
+
         float[] vertices = {
-                // position
-                -0.5f,  0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.5f,  0.5f, 0.0f
+                -50f,  50f, 0f,
+                -50f, -50f, 0f,
+                50f, -50f, 0f,
+                50f,  50f, 0f
         };
 
         int[] indices = {
@@ -84,11 +86,30 @@ public class GameEngine implements GLEventListener {
         if (Input.isKeyPressed(KeyEvent.VK_ESCAPE)) {
             stop();
         }
+
+        if (Input.isKeyPressed(KeyEvent.VK_W)) {
+            camera.move(0, 200 * Time.getDeltaTime());
+        }
+
+        if (Input.isKeyPressed(KeyEvent.VK_S)) {
+            camera.move(0, -200 * Time.getDeltaTime());
+        }
+
+        if (Input.isKeyPressed(KeyEvent.VK_A)) {
+            camera.move(-200 * Time.getDeltaTime(), 0);
+        }
+
+        if (Input.isKeyPressed(KeyEvent.VK_D)) {
+            camera.move(200 * Time.getDeltaTime(), 0);
+        }
+
+        camera.update();
     }
 
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         shaderProgram.use(gl);
+        shaderProgram.setUniformMatrix4f(gl, "uProjectionView", camera.getProjectionView());
         quad.render(gl);
         shaderProgram.detach(gl);
     }
@@ -123,7 +144,7 @@ public class GameEngine implements GLEventListener {
             shaderProgram.delete(gl);
         }
 
-        if (animator != null && animator.isStarted()) {
+        if (animator != null) {
             animator.stop();
         }
 

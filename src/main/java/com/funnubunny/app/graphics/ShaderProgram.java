@@ -2,6 +2,7 @@ package com.funnubunny.app.graphics;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
+import org.joml.Matrix4f;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -108,5 +109,12 @@ public class ShaderProgram {
         }
 
         return builder.toString();
+    }
+
+    public void setUniformMatrix4f(GL3 gl, String name, Matrix4f matrix) {
+        int location = gl.glGetUniformLocation(programId, name);
+        float[] buffer = new float[16];
+        matrix.get(buffer);
+        gl.glUniformMatrix4fv(location, 1, false, buffer, 0);
     }
 }
