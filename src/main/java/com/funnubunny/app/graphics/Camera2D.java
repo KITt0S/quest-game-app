@@ -1,6 +1,7 @@
 package com.funnubunny.app.graphics;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class Camera2D {
@@ -8,27 +9,48 @@ public class Camera2D {
     private final Matrix4f view;
     private final Matrix4f projectionView;
 
-    private final Vector3f position;
+    private final Vector2f position;
 
-    private float zoom;
+    private final float width;
+    private final float height;
+
+    private final float deadZoneX = 120f;
+    private final float deadZoneY = 80f;
+
+    private final float smoothness = 4f;
 
     public Camera2D(float width, float height) {
-        position = new Vector3f(0, 0, 0);
-        zoom = 1.0f;
-        projection = new Matrix4f();
+        this.width = width;
+        this.height = height;
+
+        projection = new Matrix4f().ortho2D(-width / 2, width / 2, -height / 2, height / 2);
         view = new Matrix4f();
         projectionView = new Matrix4f();
 
-        setProjection(width, height);
+        position = new Vector2f();
     }
 
-    public void setProjection(float width, float height) {
-        projection.ortho2D(-width / 2, width / 2, -height / 2, height / 2);
+    public void follow(Vector2f target, float deltaTime) {
+        float dx = target.x - position.x;
+        float dy = target.y - position.y;
+
+        float targetX = position.x;
+        float targetY = position.y;
+
+        if (Math.abs(dx) > deadZoneX) {
+            targetX += dx - Math.signum(dx) * deadZoneX;
+        }
+
+        if (Math.abs(dy) > deadZoneY) {
+            targetY += dy - Math.signum(dy) * deadZoneY;
+        }
+
+        position.x += (targetX - position.x) * smoothness * deltaTime;
+        position.y += (targetY - position.y) * smoothness * deltaTime;
     }
 
     public void update() {
-        view.identity();
-        view.translate(position.x, position.y, 0);
+        view.identity().translate(-position.x, -position.y, 0);
         projectionView.set(projection).mul(view);
     }
 
@@ -36,16 +58,7 @@ public class Camera2D {
         return projectionView;
     }
 
-    public void move(float x, float y) {
-        position.x += x;
-        position.y += y;
-    }
-
-    public void setPosition(float x, float y) {
-        position.set(x, y, 0);
-    }
-
-    public Vector3f getPosition() {
+    public Vector2f getPosition() {
         return position;
     }
 }

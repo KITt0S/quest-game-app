@@ -161,7 +161,7 @@ public class GameEngine implements GLEventListener {
         islandScene.setLighthouseOn(worldState.isLighthouseOn());
         lighthouse.setActive(worldState.isLighthouseOn());
 
-        camera.setPosition(player.getTransform().getPosition().x, player.getTransform().getPosition().y);
+        camera.follow(player.getPosition(), Time.getDeltaTime());
         camera.update();
     }
 
