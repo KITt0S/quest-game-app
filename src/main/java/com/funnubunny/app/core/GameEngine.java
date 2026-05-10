@@ -2,15 +2,13 @@ package com.funnubunny.app.core;
 
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
-import com.funnubunny.app.graphics.Camera2D;
-import com.funnubunny.app.graphics.Mesh;
-import com.funnubunny.app.graphics.ShaderProgram;
-import com.funnubunny.app.graphics.SpriteRenderer;
+import com.funnubunny.app.graphics.*;
 import com.funnubunny.app.quest.Dialogue;
 import com.funnubunny.app.quest.QuestManager;
 import com.funnubunny.app.quest.QuestState;
 import com.funnubunny.app.ui.DialogueBox;
 import com.funnubunny.app.ui.HUD;
+import com.funnubunny.app.world.FogSystem;
 import com.funnubunny.app.world.IslandScene;
 import com.funnubunny.app.world.Lighthouse;
 import com.funnubunny.app.world.WorldState;
@@ -36,9 +34,12 @@ public class GameEngine implements GLEventListener {
 
     private ShaderProgram colorShader;
     private ShaderProgram spriteShader;
+    private ShaderProgram fogShader;
 
     private Mesh colorQuad;
     private Mesh spriteQuad;
+
+    private SpriteRenderer spriteRenderer;
 
     private Camera2D camera;
 
@@ -49,9 +50,11 @@ public class GameEngine implements GLEventListener {
 
     private QuestManager questManager;
     private WorldState worldState;
-    
+
     private DialogueBox dialogueBox;
     private HUD hud;
+
+    private FogSystem fogSystem;
 
     public void start() {
         initializeWindow();
@@ -90,30 +93,31 @@ public class GameEngine implements GLEventListener {
 
         colorShader = new ShaderProgram(gl, "/shaders/color.vert", "/shaders/color.frag");
         spriteShader = new ShaderProgram(gl, "/shaders/sprite.vert", "/shaders/sprite.frag");
+        fogShader = new ShaderProgram(gl, "/shaders/fog.vert", "/shaders/fog.frag");
 
         camera = new Camera2D(WIDTH, HEIGHT);
 
         float[] shapeVertices = {
-                -0.5f,  0.5f, 0f,
+                -0.5f, 0.5f, 0f,
                 -0.5f, -0.5f, 0f,
                 0.5f, -0.5f, 0f,
-                0.5f,  0.5f, 0f
+                0.5f, 0.5f, 0f
         };
 
         float[] vertices = {
                 // x y z u v
-                -0.5f,  0.5f, 0f, 0f, 1f,
+                -0.5f, 0.5f, 0f, 0f, 1f,
                 -0.5f, -0.5f, 0f, 0f, 0f,
                 0.5f, -0.5f, 0f, 1f, 0f,
-                0.5f,  0.5f, 0f, 1f, 1f
+                0.5f, 0.5f, 0f, 1f, 1f
         };
 
         float[] spriteVertices = {
                 // x y z u v
-                -0.5f,  0.5f, 0f, 0f, 1f,
+                -0.5f, 0.5f, 0f, 0f, 1f,
                 -0.5f, -0.5f, 0f, 0f, 0f,
                 0.5f, -0.5f, 0f, 1f, 0f,
-                0.5f,  0.5f, 0f, 1f, 1f
+                0.5f, 0.5f, 0f, 1f, 1f
         };
 
         int[] indices = {
@@ -124,7 +128,10 @@ public class GameEngine implements GLEventListener {
         colorQuad = Mesh.getColorMesh(gl, shapeVertices, indices);
         spriteQuad = Mesh.getSpriteMesh(gl, spriteVertices, indices);
 
+        spriteRenderer = new SpriteRenderer(spriteQuad);
+
         player = new Player();
+        player.setSprite(new Sprite(new Texture("/textures/player.png")));
         player.setSpriteRenderer(new SpriteRenderer(spriteQuad));
 
         npc = new NPC("Old Keeper",
@@ -143,6 +150,10 @@ public class GameEngine implements GLEventListener {
 
         dialogueBox = new DialogueBox();
         hud = new HUD();
+
+        Texture fogTexture = new Texture("/textures/fog.png");
+        Sprite fogSprite = new Sprite(fogTexture);
+        fogSystem = new FogSystem(fogSprite, spriteRenderer, fogShader);
     }
 
     @Override
@@ -188,14 +199,17 @@ public class GameEngine implements GLEventListener {
 
         camera.follow(player.getPosition(), Time.getDeltaTime());
         camera.update();
+
+        fogSystem.update(Time.getDeltaTime());
     }
 
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         islandScene.render(gl, colorShader, camera);
-        lighthouse.render(gl, colorShader, camera);
-        npc.render(gl, colorShader, camera);
         player.render(gl, spriteShader, camera);
+        npc.render(gl, colorShader, camera);
+        lighthouse.render(gl, colorShader, camera);
+        fogSystem.render(gl, camera);
         dialogueBox.render(gl);
         hud.render(gl);
     }
@@ -226,7 +240,7 @@ public class GameEngine implements GLEventListener {
             colorQuad.delete(gl);
         }
 
-        if (spriteQuad != null ){
+        if (spriteQuad != null) {
             spriteQuad.delete(gl);
         }
 

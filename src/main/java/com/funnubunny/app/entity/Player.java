@@ -12,9 +12,8 @@ public class Player extends Entity {
 
     public Player() {
         super();
-        setSize(40f, 40f);
+        setSize(32f, 48f);
         setColor(0.8f, 0.85f, 1.0f);
-        setSprite(new Sprite(new Texture("/textures/player.png")));
     }
 
     @Override
