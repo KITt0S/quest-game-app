@@ -1,8 +1,6 @@
 package com.funnubunny.app.entity;
 
-import com.funnubunny.app.graphics.Camera2D;
-import com.funnubunny.app.graphics.Mesh;
-import com.funnubunny.app.graphics.ShaderProgram;
+import com.funnubunny.app.graphics.*;
 import com.jogamp.opengl.GL3;
 
 public abstract class Entity {
@@ -10,6 +8,9 @@ public abstract class Entity {
     protected final Transform transform;
 
     protected Mesh mesh;
+
+    protected Sprite sprite;
+    protected SpriteRenderer spriteRenderer;
 
     protected float width = 50f;
     protected float height = 50f;
@@ -39,6 +40,14 @@ public abstract class Entity {
         this.r = r;
         this.g = g;
         this.b = b;
+    }
+
+    public void setSprite(Sprite sprite) {
+        this.sprite = sprite;
+    }
+
+    public void setSpriteRenderer(SpriteRenderer spriteRenderer) {
+        this.spriteRenderer = spriteRenderer;
     }
 
     public abstract void update();

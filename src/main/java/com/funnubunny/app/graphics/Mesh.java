@@ -1,6 +1,8 @@
 package com.funnubunny.app.graphics;
 
 import com.jogamp.opengl.GL3;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -8,15 +10,16 @@ import java.nio.IntBuffer;
 import static com.jogamp.common.nio.Buffers.newDirectFloatBuffer;
 import static com.jogamp.common.nio.Buffers.newDirectIntBuffer;
 
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Mesh {
-    private final int vaoId;
-    private final int vboId;
-    private final int eboId;
+    private int vaoId;
+    private int vboId;
+    private int eboId;
 
-    private final int indexCount;
+    private int indexCount;
 
-    public Mesh(GL3 gl, float[] vertices, int[] indices) {
-        indexCount = indices.length;
+    public static Mesh getColorMesh(GL3 gl, float[] vertices, int[] indices) {
+        int indexCount = indices.length;
 
         IntBuffer vaoBuffer = newDirectIntBuffer(1);
         IntBuffer vboBuffer = newDirectIntBuffer(1);
@@ -26,9 +29,9 @@ public class Mesh {
         gl.glGenBuffers(1, vboBuffer);
         gl.glGenBuffers(1, eboBuffer);
 
-        vaoId = vaoBuffer.get(0);
-        vboId = vboBuffer.get(0);
-        eboId = eboBuffer.get(0);
+        int vaoId = vaoBuffer.get(0);
+        int vboId = vboBuffer.get(0);
+        int eboId = eboBuffer.get(0);
 
         gl.glBindVertexArray(vaoId);
 
@@ -45,6 +48,46 @@ public class Mesh {
 
         gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
         gl.glBindVertexArray(0);
+
+        return new Mesh(vaoId, vboId, eboId, indexCount);
+    }
+
+    public static Mesh getSpriteMesh(GL3 gl, float[] vertices, int[] indices) {
+        int indexCount = indices.length;
+
+        IntBuffer vaoBuffer = newDirectIntBuffer(1);
+        IntBuffer vboBuffer = newDirectIntBuffer(1);
+        IntBuffer eboBuffer = newDirectIntBuffer(1);
+
+        gl.glGenVertexArrays(1, vaoBuffer);
+        gl.glGenBuffers(1, vboBuffer);
+        gl.glGenBuffers(1, eboBuffer);
+
+        int vaoId = vaoBuffer.get(0);
+        int vboId = vboBuffer.get(0);
+        int eboId = eboBuffer.get(0);
+
+        gl.glBindVertexArray(vaoId);
+
+        FloatBuffer vertexBuffer = newDirectFloatBuffer(vertices);
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vboId);
+        gl.glBufferData(GL3.GL_ARRAY_BUFFER, (long) vertices.length * Float.BYTES, vertexBuffer, GL3.GL_STATIC_DRAW);
+
+        IntBuffer indexBuffer = newDirectIntBuffer(indices);
+        gl.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, eboId);
+        gl.glBufferData(GL3.GL_ELEMENT_ARRAY_BUFFER, (long) indices.length * Integer.BYTES, indexBuffer, GL3.GL_STATIC_DRAW);
+
+        int stride = 5 * Float.BYTES;
+        gl.glVertexAttribPointer(0, 3, GL3.GL_FLOAT, false, stride, 0L);
+        gl.glEnableVertexAttribArray(0);
+
+        gl.glVertexAttribPointer(1, 2, GL3.GL_FLOAT, false, stride, 3 * Float.BYTES);
+        gl.glEnableVertexAttribArray(1);
+
+        gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
+        gl.glBindVertexArray(0);
+
+        return new Mesh(vaoId, vboId, eboId, indexCount);
     }
 
     public void render(GL3 gl) {

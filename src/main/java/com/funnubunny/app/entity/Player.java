@@ -2,7 +2,9 @@ package com.funnubunny.app.entity;
 
 import com.funnubunny.app.core.Input;
 import com.funnubunny.app.core.Time;
+import com.funnubunny.app.graphics.*;
 import com.jogamp.newt.event.KeyEvent;
+import com.jogamp.opengl.GL3;
 import org.joml.Vector2f;
 
 public class Player extends Entity {
@@ -12,6 +14,7 @@ public class Player extends Entity {
         super();
         setSize(40f, 40f);
         setColor(0.8f, 0.85f, 1.0f);
+        setSprite(new Sprite(new Texture("/textures/player.png")));
     }
 
     @Override
@@ -37,5 +40,14 @@ public class Player extends Entity {
 
     public Vector2f getPosition() {
         return transform.getPosition();
+    }
+
+    @Override
+    public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {
+        if (sprite == null || spriteRenderer == null) {
+            return;
+        }
+
+        spriteRenderer.render(gl, shader, camera, sprite, transform, width, height);
     }
 }

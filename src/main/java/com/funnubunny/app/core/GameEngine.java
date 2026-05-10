@@ -5,8 +5,8 @@ import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.graphics.Camera2D;
 import com.funnubunny.app.graphics.Mesh;
 import com.funnubunny.app.graphics.ShaderProgram;
+import com.funnubunny.app.graphics.SpriteRenderer;
 import com.funnubunny.app.quest.Dialogue;
-import com.funnubunny.app.quest.DialogueManager;
 import com.funnubunny.app.quest.QuestManager;
 import com.funnubunny.app.quest.QuestState;
 import com.funnubunny.app.ui.DialogueBox;
@@ -34,8 +34,12 @@ public class GameEngine implements GLEventListener {
 
     private final Input input = new Input();
 
-    private ShaderProgram shader;
-    private Mesh quad;
+    private ShaderProgram colorShader;
+    private ShaderProgram spriteShader;
+
+    private Mesh colorQuad;
+    private Mesh spriteQuad;
+
     private Camera2D camera;
 
     private Player player;
@@ -75,22 +79,41 @@ public class GameEngine implements GLEventListener {
         GL3 gl = drawable.getGL().getGL3();
         gl.glViewport(0, 0, WIDTH, HEIGHT);
         gl.glClearColor(0.04f, 0.05f, 0.08f, 1.0f);
+        gl.glEnable(GL3.GL_BLEND);
+        gl.glBlendFunc(GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA);
+
         System.out.println("====================================");
         System.out.println("OpenGL INITIALIZED");
         System.out.println("Version : " + gl.glGetString(GL3.GL_VERSION));
         System.out.println("Renderer: " + gl.glGetString(GL3.GL_RENDERER));
         System.out.println("====================================");
 
-        shader = new ShaderProgram(gl, "/shaders/default.vert", "/shaders/default.frag");
+        colorShader = new ShaderProgram(gl, "/shaders/color.vert", "/shaders/color.frag");
+        spriteShader = new ShaderProgram(gl, "/shaders/sprite.vert", "/shaders/sprite.frag");
 
         camera = new Camera2D(WIDTH, HEIGHT);
 
-        float[] vertices = {
-
+        float[] shapeVertices = {
                 -0.5f,  0.5f, 0f,
                 -0.5f, -0.5f, 0f,
                 0.5f, -0.5f, 0f,
                 0.5f,  0.5f, 0f
+        };
+
+        float[] vertices = {
+                // x y z u v
+                -0.5f,  0.5f, 0f, 0f, 1f,
+                -0.5f, -0.5f, 0f, 0f, 0f,
+                0.5f, -0.5f, 0f, 1f, 0f,
+                0.5f,  0.5f, 0f, 1f, 1f
+        };
+
+        float[] spriteVertices = {
+                // x y z u v
+                -0.5f,  0.5f, 0f, 0f, 1f,
+                -0.5f, -0.5f, 0f, 0f, 0f,
+                0.5f, -0.5f, 0f, 1f, 0f,
+                0.5f,  0.5f, 0f, 1f, 1f
         };
 
         int[] indices = {
@@ -98,20 +121,22 @@ public class GameEngine implements GLEventListener {
                 2, 3, 0
         };
 
-        quad = new Mesh(gl, vertices, indices);
+        colorQuad = Mesh.getColorMesh(gl, shapeVertices, indices);
+        spriteQuad = Mesh.getSpriteMesh(gl, spriteVertices, indices);
+
         player = new Player();
-        player.setMesh(quad);
+        player.setSpriteRenderer(new SpriteRenderer(spriteQuad));
 
         npc = new NPC("Old Keeper",
                 new Dialogue(List.of(
                         "The lighthouse went dark...",
                         "Something is wrong in the fog.",
                         "Find the power source.")));
-        npc.setMesh(quad);
+        npc.setMesh(colorQuad);
 
-        islandScene = new IslandScene(quad);
+        islandScene = new IslandScene(colorQuad);
         lighthouse = new Lighthouse();
-        lighthouse.setMesh(quad);
+        lighthouse.setMesh(colorQuad);
 
         questManager = new QuestManager();
         worldState = new WorldState();
@@ -167,10 +192,10 @@ public class GameEngine implements GLEventListener {
 
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
-        islandScene.render(gl, shader, camera);
-        lighthouse.render(gl, shader, camera);
-        npc.render(gl, shader, camera);
-        player.render(gl, shader, camera);
+        islandScene.render(gl, colorShader, camera);
+        lighthouse.render(gl, colorShader, camera);
+        npc.render(gl, colorShader, camera);
+        player.render(gl, spriteShader, camera);
         dialogueBox.render(gl);
         hud.render(gl);
     }
@@ -197,12 +222,16 @@ public class GameEngine implements GLEventListener {
     public void dispose(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
 
-        if (quad != null) {
-            quad.delete(gl);
+        if (colorQuad != null) {
+            colorQuad.delete(gl);
         }
 
-        if (shader != null) {
-            shader.delete(gl);
+        if (spriteQuad != null ){
+            spriteQuad.delete(gl);
+        }
+
+        if (colorShader != null) {
+            colorShader.delete(gl);
         }
 
         if (animator != null) {
