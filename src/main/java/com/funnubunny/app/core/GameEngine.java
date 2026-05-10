@@ -221,7 +221,7 @@ public class GameEngine implements GLEventListener {
         if (canInteract && Input.isKeyPressed(KeyEvent.VK_E)) {
             if (!dialogueBox.isActive()) {
                 dialogueBox.show(npc.getDialogue());
-                questManager.advance();
+                questManager.setState(QuestState.TALKED_TO_KEEPER);
             }
         }
 
@@ -249,12 +249,36 @@ public class GameEngine implements GLEventListener {
 
                 if (distance < INTERACTION_DISTANCE && Input.isKeyPressed(KeyEvent.VK_E)) {
                     note.interact();
+
+                    int discovered = noteManager.discoveredCount();
+
+                    if (discovered >= 1 && questManager.getState() == QuestState.TALKED_TO_KEEPER) {
+
+                        questManager.setState(QuestState.FOUND_FIRST_NOTE);
+                    }
                 }
             }
         }
 
         if (noteManager.hasEnoughClues()) {
-            questManager.advance();
+            questManager.setState(QuestState.FOUND_ALL_NOTES);
+        }
+
+        float lighthouseDistance = player.getPosition().distance(lighthouse.getPosition());
+
+        if (lighthouseDistance < INTERACTION_DISTANCE && questManager.getState() == QuestState.FOUND_ALL_NOTES) {
+            questManager.setState(QuestState.REACHED_LIGHTHOUSE);
+        }
+
+        if (questManager.getState() == QuestState.REACHED_LIGHTHOUSE) {
+
+            System.out.println("\nThe lighthouse mechanism vibrates softly...");
+
+            System.out.println("Press R to relight");
+
+            System.out.println("Press F to destroy");
+
+            questManager.setState(QuestState.FINAL_CHOICE);
         }
     }
 

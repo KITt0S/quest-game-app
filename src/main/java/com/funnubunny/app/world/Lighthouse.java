@@ -1,6 +1,7 @@
 package com.funnubunny.app.world;
 
 import com.funnubunny.app.entity.Entity;
+import org.joml.Vector2f;
 
 public class Lighthouse extends Entity {
     private boolean active = false;
@@ -25,5 +26,9 @@ public class Lighthouse extends Entity {
     @Override
     public void update() {
 
+    }
+
+    public Vector2f getPosition() {
+        return transform.getPosition();
     }
 }

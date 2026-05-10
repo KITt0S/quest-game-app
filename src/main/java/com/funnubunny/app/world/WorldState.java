@@ -10,9 +10,6 @@ public class WorldState {
     }
 
     public void updateFromQuest(QuestState state) {
-        if (state == QuestState.LIGHTHOUSE_ON || state == QuestState.COMPLETED) {
-            lighthouseOn = true;
-            System.out.println("[WORLD] Lighthouse activated. Light returns.");
-        }
+
     }
 }
