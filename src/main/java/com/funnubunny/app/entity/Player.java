@@ -10,6 +10,8 @@ public class Player extends Entity {
 
     public Player() {
         super();
+        setSize(40f, 40f);
+        setColor(0.8f, 0.85f, 1.0f);
     }
 
     @Override

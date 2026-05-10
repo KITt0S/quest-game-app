@@ -2,6 +2,7 @@ package com.funnubunny.app.graphics;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
+import org.joml.Matrix2f;
 import org.joml.Matrix4f;
 
 import java.io.BufferedReader;
@@ -121,5 +122,15 @@ public class ShaderProgram {
     public void setUniformBool(GL3 gl, String name, boolean value) {
         int location = gl.glGetUniformLocation(programId, name);
         gl.glUniform1i(location, value ? 1 : 0);
+    }
+    
+    public void setUniformVec2(GL3 gl, String name, float x, float y) {
+        int location = gl.glGetUniformLocation(programId, name);
+        gl.glUniform2f(location, x, y);
+    }
+
+    public void setUniformVec3(GL3 gl, String name, float x,float y, float z) {
+        int location = gl.glGetUniformLocation(programId, name);
+        gl.glUniform3f(location, x, y, z);
     }
 }

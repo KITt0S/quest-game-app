@@ -11,6 +11,7 @@ import com.funnubunny.app.quest.QuestManager;
 import com.funnubunny.app.quest.QuestState;
 import com.funnubunny.app.ui.DialogueBox;
 import com.funnubunny.app.ui.HUD;
+import com.funnubunny.app.world.IslandScene;
 import com.funnubunny.app.world.Lighthouse;
 import com.funnubunny.app.world.WorldState;
 import com.jogamp.newt.event.KeyEvent;
@@ -39,6 +40,7 @@ public class GameEngine implements GLEventListener {
 
     private Player player;
     private NPC npc;
+    private IslandScene islandScene;
     private Lighthouse lighthouse;
 
     private QuestManager questManager;
@@ -84,10 +86,11 @@ public class GameEngine implements GLEventListener {
         camera = new Camera2D(WIDTH, HEIGHT);
 
         float[] vertices = {
-                -25f, 25f, 0f,
-                -25f, -25f, 0f,
-                25f, -25f, 0f,
-                25f, 25f, 0f
+
+                -0.5f,  0.5f, 0f,
+                -0.5f, -0.5f, 0f,
+                0.5f, -0.5f, 0f,
+                0.5f,  0.5f, 0f
         };
 
         int[] indices = {
@@ -106,9 +109,9 @@ public class GameEngine implements GLEventListener {
                         "Find the power source.")));
         npc.setMesh(quad);
 
+        islandScene = new IslandScene(quad);
         lighthouse = new Lighthouse();
         lighthouse.setMesh(quad);
-        lighthouse.getTransform().setPosition(200, 0);
 
         questManager = new QuestManager();
         worldState = new WorldState();
@@ -155,6 +158,7 @@ public class GameEngine implements GLEventListener {
 
         worldState.updateFromQuest(questManager.getState());
 
+        islandScene.setLighthouseOn(worldState.isLighthouseOn());
         lighthouse.setActive(worldState.isLighthouseOn());
 
         camera.setPosition(player.getTransform().getPosition().x, player.getTransform().getPosition().y);
@@ -163,12 +167,10 @@ public class GameEngine implements GLEventListener {
 
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
-        shader.use(gl);
-        shader.setUniformBool(gl, "uLighthouseOn", worldState.isLighthouseOn());
+        islandScene.render(gl, shader, camera);
         player.render(gl, shader, camera);
         npc.render(gl, shader, camera);
         lighthouse.render(gl, shader, camera);
-        shader.detach(gl);
         dialogueBox.render(gl);
         hud.render(gl);
     }

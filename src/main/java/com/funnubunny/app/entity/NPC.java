@@ -12,6 +12,9 @@ public class NPC extends Entity implements Interactable {
         super();
         this.name = name;
         this.dialogue = dialogue;
+        setSize(45f, 60f);
+        setColor(0.7f, 0.65f, 0.5f);
+        transform.setPosition(0, -150);
     }
 
     @Override

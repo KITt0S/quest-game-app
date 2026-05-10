@@ -2,13 +2,15 @@
 
 out vec4 fragColor;
 
-uniform bool uLightHouseOn;
+uniform vec3 uColor;
+uniform bool uLighthouseOn;
 
 void main() {
-    vec3 darkFog = vec3(0.02, 0.03, 0.06);
-    vec3 litFog = vec3(0.2, 0.25, 0.3);
+    vec3 color = uColor;
 
-    vec3 color = uLightHouseOn ? litFog : darkFog;
+    if (uLighthouseOn) {
+        color += vec3(0.12, 0.12, 0.08);
+    }
 
     fragColor = vec4(color, 1.0);
 }
