@@ -3,9 +3,7 @@ package com.funnubunny.app.core;
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.graphics.*;
-import com.funnubunny.app.quest.Dialogue;
-import com.funnubunny.app.quest.QuestManager;
-import com.funnubunny.app.quest.QuestState;
+import com.funnubunny.app.quest.*;
 import com.funnubunny.app.ui.DialogueBox;
 import com.funnubunny.app.ui.HUD;
 import com.funnubunny.app.world.FogSystem;
@@ -17,6 +15,7 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.FPSAnimator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameEngine implements GLEventListener {
@@ -55,6 +54,9 @@ public class GameEngine implements GLEventListener {
     private HUD hud;
 
     private FogSystem fogSystem;
+
+    private NoteManager noteManager;
+    private List<Note> notes;
 
     public void start() {
         initializeWindow();
@@ -154,6 +156,46 @@ public class GameEngine implements GLEventListener {
         Texture fogTexture = new Texture("/textures/fog.png");
         Sprite fogSprite = new Sprite(fogTexture);
         fogSystem = new FogSystem(fogSprite, spriteRenderer, fogShader);
+
+        noteManager = new NoteManager();
+        notes = new ArrayList<>();
+
+        Texture noteTexture = new Texture("/textures/note.png");
+        Sprite noteSprite = new Sprite(noteTexture);
+
+        Clue clue1 = new Clue(
+                "Fog swallowed the northern ship. " +
+                        "The light was already awake.");
+
+        noteManager.addClue(clue1);
+
+        Clue clue2 = new Clue(
+                "Keeper says the light protects us. " +
+                        "Then why do the bells ring underwater?");
+        noteManager.addClue(clue2);
+
+        Clue clue3 = new Clue(
+                "Do not let him relight the tower.");
+        noteManager.addClue(clue3);
+
+        Note note1 = new Note(clue1);
+        note1.setSprite(noteSprite);
+        note1.setSpriteRenderer(spriteRenderer);
+        note1.getTransform().setPosition(-350, 120);
+
+        Note note2 = new Note(clue2);
+        note2.setSprite(noteSprite);
+        note2.setSpriteRenderer(spriteRenderer);
+        note2.getTransform().setPosition(250, -180);
+
+        Note note3 = new Note(clue3);
+        note3.setSprite(noteSprite);
+        note3.setSpriteRenderer(spriteRenderer);
+        note3.getTransform().setPosition(420, 260);
+
+        notes.add(note1);
+        notes.add(note2);
+        notes.add(note3);
     }
 
     @Override
@@ -171,12 +213,7 @@ public class GameEngine implements GLEventListener {
 
         player.update();
 
-        float dx = player.getPosition().x - npc.getPosition().x;
-        float dy = player.getPosition().y - npc.getPosition().y;
-
-        float distance = (float) Math.sqrt(dx * dx + dy * dy);
-
-        boolean canInteract = distance < INTERACTION_DISTANCE;
+        boolean canInteract = player.getPosition().distance(npc.getPosition()) < INTERACTION_DISTANCE;
 
         hud.setCanInteract(canInteract);
         hud.setQuestState(questManager.getState());
@@ -184,7 +221,7 @@ public class GameEngine implements GLEventListener {
         if (canInteract && Input.isKeyPressed(KeyEvent.VK_E)) {
             if (!dialogueBox.isActive()) {
                 dialogueBox.show(npc.getDialogue());
-                questManager.setState(QuestState.TALKED_TO_KEEPER);
+                questManager.advance();
             }
         }
 
@@ -201,6 +238,24 @@ public class GameEngine implements GLEventListener {
         camera.update();
 
         fogSystem.update(Time.getDeltaTime());
+
+        for (Note note : notes) {
+            note.update();
+        }
+
+        for (Note note : notes) {
+            if (!note.isCollected()) {
+                float distance = player.getPosition().distance(note.getPosition());
+
+                if (distance < INTERACTION_DISTANCE && Input.isKeyPressed(KeyEvent.VK_E)) {
+                    note.interact();
+                }
+            }
+        }
+
+        if (noteManager.hasEnoughClues()) {
+            questManager.advance();
+        }
     }
 
     private void render(GL3 gl) {
@@ -209,6 +264,13 @@ public class GameEngine implements GLEventListener {
         player.render(gl, spriteShader, camera);
         npc.render(gl, colorShader, camera);
         lighthouse.render(gl, colorShader, camera);
+
+        for (Note note : notes) {
+            if (!note.isCollected()) {
+                note.render(gl, spriteShader, camera);
+            }
+        }
+
         fogSystem.render(gl, camera);
         dialogueBox.render(gl);
         hud.render(gl);
