@@ -12,11 +12,19 @@ public class Input implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent event) {
+        if (event.isAutoRepeat()) {
+            return;
+        }
+
         pressedKeys.add(event.getKeyCode());
     }
 
     @Override
     public void keyReleased(KeyEvent event) {
+        if (event.isAutoRepeat()) {
+            return;
+        }
+
         pressedKeys.remove(event.getKeyCode());
     }
 

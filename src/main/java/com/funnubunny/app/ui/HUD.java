@@ -17,12 +17,12 @@ public class HUD extends UI {
 
     @Override
     public void render(GL3 gl) {
-        if (canInteract) {
-            System.out.println("[HUD] Press E to interact");
-        }
-
-        if (state != null) {
-            System.out.println("[QUEST] " + state);
-        }
+//        if (canInteract) {
+//            System.out.println("[HUD] Press E to interact");
+//        }
+//
+//        if (state != null) {
+//            System.out.println("[QUEST] " + state);
+//        }
     }
 }

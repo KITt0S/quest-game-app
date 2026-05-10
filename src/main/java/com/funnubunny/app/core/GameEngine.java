@@ -168,9 +168,9 @@ public class GameEngine implements GLEventListener {
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         islandScene.render(gl, shader, camera);
-        player.render(gl, shader, camera);
-        npc.render(gl, shader, camera);
         lighthouse.render(gl, shader, camera);
+        npc.render(gl, shader, camera);
+        player.render(gl, shader, camera);
         dialogueBox.render(gl);
         hud.render(gl);
     }
