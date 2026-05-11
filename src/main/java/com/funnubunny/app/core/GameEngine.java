@@ -2,14 +2,13 @@ package com.funnubunny.app.core;
 
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
+import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.graphics.*;
+import com.funnubunny.app.interaction.InteractionSystem;
 import com.funnubunny.app.quest.*;
 import com.funnubunny.app.ui.DialogueBox;
 import com.funnubunny.app.ui.HUD;
-import com.funnubunny.app.world.FogSystem;
-import com.funnubunny.app.world.IslandScene;
-import com.funnubunny.app.world.Lighthouse;
-import com.funnubunny.app.world.WorldState;
+import com.funnubunny.app.world.*;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
@@ -47,16 +46,20 @@ public class GameEngine implements GLEventListener {
     private IslandScene islandScene;
     private Lighthouse lighthouse;
 
-    private QuestManager questManager;
-    private WorldState worldState;
-
     private DialogueBox dialogueBox;
     private HUD hud;
 
+    private CameraSystem cameraSystem;
+    private InteractionSystem interactionSystem;
+    private WorldSystem worldSystem;
+    private NoteSystem noteSystem;
     private FogSystem fogSystem;
 
+    private QuestManager questManager;
     private NoteManager noteManager;
     private List<Note> notes;
+
+    private EventBus eventBus;
 
     public void start() {
         initializeWindow();
@@ -134,7 +137,7 @@ public class GameEngine implements GLEventListener {
 
         player = new Player();
         player.setSprite(new Sprite(new Texture("/textures/player.png")));
-        player.setSpriteRenderer(new SpriteRenderer(spriteQuad));
+        player.setSpriteRenderer(spriteRenderer);
 
         npc = new NPC("Old Keeper",
                 new Dialogue(List.of(
@@ -144,11 +147,14 @@ public class GameEngine implements GLEventListener {
         npc.setMesh(colorQuad);
 
         islandScene = new IslandScene(colorQuad);
+
+        Texture lighthouseTexture = new Texture("/textures/lighthouse.png");
+        Sprite lighthouseSprite = new Sprite(lighthouseTexture);
         lighthouse = new Lighthouse();
-        lighthouse.setMesh(colorQuad);
+        lighthouse.setSprite(lighthouseSprite);
+        lighthouse.setSpriteRenderer(spriteRenderer);
 
         questManager = new QuestManager();
-        worldState = new WorldState();
 
         dialogueBox = new DialogueBox();
         hud = new HUD();
@@ -196,6 +202,17 @@ public class GameEngine implements GLEventListener {
         notes.add(note1);
         notes.add(note2);
         notes.add(note3);
+
+        cameraSystem = new CameraSystem(camera, player);
+
+        eventBus = new EventBus();
+        eventBus.register(questManager);
+
+        interactionSystem = new InteractionSystem(player, npc, dialogueBox, notes, noteManager, questManager, lighthouse, eventBus);
+
+        worldSystem = new WorldSystem(questManager, islandScene, lighthouse);
+
+        noteSystem = new NoteSystem(notes);
     }
 
     @Override
@@ -207,78 +224,18 @@ public class GameEngine implements GLEventListener {
     }
 
     private void update() {
+        handleGlobalInput();
+        player.update();
+        interactionSystem.update();
+        noteSystem.update();
+        worldSystem.update();
+        cameraSystem.update();
+        fogSystem.update(Time.getDeltaTime());
+    }
+
+    private void handleGlobalInput() {
         if (Input.isKeyPressed(KeyEvent.VK_ESCAPE)) {
             stop();
-        }
-
-        player.update();
-
-        boolean canInteract = player.getPosition().distance(npc.getPosition()) < INTERACTION_DISTANCE;
-
-        hud.setCanInteract(canInteract);
-        hud.setQuestState(questManager.getState());
-
-        if (canInteract && Input.isKeyPressed(KeyEvent.VK_E)) {
-            if (!dialogueBox.isActive()) {
-                dialogueBox.show(npc.getDialogue());
-                questManager.setState(QuestState.TALKED_TO_KEEPER);
-            }
-        }
-
-        if (dialogueBox.isActive() && Input.isKeyPressed(KeyEvent.VK_SPACE)) {
-            dialogueBox.next();
-        }
-
-        worldState.updateFromQuest(questManager.getState());
-
-        islandScene.setLighthouseOn(worldState.isLighthouseOn());
-        lighthouse.setActive(worldState.isLighthouseOn());
-
-        camera.follow(player.getPosition(), Time.getDeltaTime());
-        camera.update();
-
-        fogSystem.update(Time.getDeltaTime());
-
-        for (Note note : notes) {
-            note.update();
-        }
-
-        for (Note note : notes) {
-            if (!note.isCollected()) {
-                float distance = player.getPosition().distance(note.getPosition());
-
-                if (distance < INTERACTION_DISTANCE && Input.isKeyPressed(KeyEvent.VK_E)) {
-                    note.interact();
-
-                    int discovered = noteManager.discoveredCount();
-
-                    if (discovered >= 1 && questManager.getState() == QuestState.TALKED_TO_KEEPER) {
-
-                        questManager.setState(QuestState.FOUND_FIRST_NOTE);
-                    }
-                }
-            }
-        }
-
-        if (noteManager.hasEnoughClues()) {
-            questManager.setState(QuestState.FOUND_ALL_NOTES);
-        }
-
-        float lighthouseDistance = player.getPosition().distance(lighthouse.getPosition());
-
-        if (lighthouseDistance < INTERACTION_DISTANCE && questManager.getState() == QuestState.FOUND_ALL_NOTES) {
-            questManager.setState(QuestState.REACHED_LIGHTHOUSE);
-        }
-
-        if (questManager.getState() == QuestState.REACHED_LIGHTHOUSE) {
-
-            System.out.println("\nThe lighthouse mechanism vibrates softly...");
-
-            System.out.println("Press R to relight");
-
-            System.out.println("Press F to destroy");
-
-            questManager.setState(QuestState.FINAL_CHOICE);
         }
     }
 
@@ -287,14 +244,8 @@ public class GameEngine implements GLEventListener {
         islandScene.render(gl, colorShader, camera);
         player.render(gl, spriteShader, camera);
         npc.render(gl, colorShader, camera);
-        lighthouse.render(gl, colorShader, camera);
-
-        for (Note note : notes) {
-            if (!note.isCollected()) {
-                note.render(gl, spriteShader, camera);
-            }
-        }
-
+        lighthouse.render(gl, spriteShader, camera);
+        noteSystem.renger(gl, spriteShader, camera);
         fogSystem.render(gl, camera);
         dialogueBox.render(gl);
         hud.render(gl);

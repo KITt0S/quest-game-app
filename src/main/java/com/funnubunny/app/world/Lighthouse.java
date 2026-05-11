@@ -1,6 +1,9 @@
 package com.funnubunny.app.world;
 
 import com.funnubunny.app.entity.Entity;
+import com.funnubunny.app.graphics.Camera2D;
+import com.funnubunny.app.graphics.ShaderProgram;
+import com.jogamp.opengl.GL3;
 import org.joml.Vector2f;
 
 public class Lighthouse extends Entity {
@@ -8,7 +11,7 @@ public class Lighthouse extends Entity {
 
     public Lighthouse() {
         super();
-        setSize(100, 280);
+        setSize(350, 350);
         setColor(0.85f, 0.85f, 0.75f);
         transform.setPosition(0, 340);
     }
@@ -30,5 +33,14 @@ public class Lighthouse extends Entity {
 
     public Vector2f getPosition() {
         return transform.getPosition();
+    }
+
+    @Override
+    public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {
+        if (sprite == null || spriteRenderer == null) {
+            return;
+        }
+
+        spriteRenderer.render(gl, shader, camera, sprite, transform, width, height);
     }
 }

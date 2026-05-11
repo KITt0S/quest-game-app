@@ -30,7 +30,7 @@ public class WorldObject implements Renderable {
         render(gl, shader, camera, false);
     }
 
-    private void render(GL3 gl, ShaderProgram shader, Camera2D camera, boolean lighthouseOn) {
+    public void render(GL3 gl, ShaderProgram shader, Camera2D camera, boolean lighthouseOn) {
         shader.use(gl);
         shader.setUniformMatrix4f(gl, "uProjectionView", camera.getProjectionView());
         shader.setUniformVec2(gl, "uPosition", transform.getPosition().x, transform.getPosition().y);

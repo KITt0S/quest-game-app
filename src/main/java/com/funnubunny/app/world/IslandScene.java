@@ -95,7 +95,7 @@ public class IslandScene implements Renderable {
     @Override
     public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {
         for (WorldObject element : worldObjects) {
-            element.render(gl, shader, camera);
+            element.render(gl, shader, camera, lighthouseOn);
         }
     }
 }
