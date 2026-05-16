@@ -33,6 +33,7 @@ public class GameEngine implements GLEventListener {
     private ShaderProgram colorShader;
     private ShaderProgram spriteShader;
     private ShaderProgram fogShader;
+    private ShaderProgram lighthouseShader;
 
     private Mesh colorQuad;
     private Mesh spriteQuad;
@@ -99,6 +100,7 @@ public class GameEngine implements GLEventListener {
         colorShader = new ShaderProgram(gl, "/shaders/color.vert", "/shaders/color.frag");
         spriteShader = new ShaderProgram(gl, "/shaders/sprite.vert", "/shaders/sprite.frag");
         fogShader = new ShaderProgram(gl, "/shaders/fog.vert", "/shaders/fog.frag");
+        lighthouseShader = new ShaderProgram(gl, "/shaders/lighthouse.vert", "/shaders/lighthouse.frag");
 
         camera = new Camera2D(WIDTH, HEIGHT);
 
@@ -148,11 +150,13 @@ public class GameEngine implements GLEventListener {
 
         islandScene = new IslandScene(colorQuad);
 
-        Texture lighthouseTexture = new Texture("/textures/lighthouse.png");
-        Sprite lighthouseSprite = new Sprite(lighthouseTexture);
+        Texture inactiveTexture = new Texture("/textures/inactive_lighthouse.png");
+        Sprite inactiveSprite = new Sprite(inactiveTexture);
+        Texture activeTexture = new Texture("/textures/active_lighthouse.png");
+        Sprite activeSprite = new Sprite(activeTexture);
         lighthouse = new Lighthouse();
-        lighthouse.setSprite(lighthouseSprite);
-        lighthouse.setSpriteRenderer(spriteRenderer);
+        lighthouse.setMesh(spriteQuad);
+        lighthouse.setSprites(inactiveSprite, activeSprite);
 
         questManager = new QuestManager();
 
@@ -244,7 +248,7 @@ public class GameEngine implements GLEventListener {
         islandScene.render(gl, colorShader, camera);
         player.render(gl, spriteShader, camera);
         npc.render(gl, colorShader, camera);
-        lighthouse.render(gl, spriteShader, camera);
+        lighthouse.render(gl, lighthouseShader, camera);
         noteSystem.renger(gl, spriteShader, camera);
         fogSystem.render(gl, camera);
         dialogueBox.render(gl);
