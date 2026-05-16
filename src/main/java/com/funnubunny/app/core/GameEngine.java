@@ -34,10 +34,12 @@ public class GameEngine implements GLEventListener {
     private ShaderProgram spriteShader;
     private ShaderProgram fogShader;
     private ShaderProgram lighthouseShader;
+    private ShaderProgram treesShader;
 
     private Mesh colorQuad;
     private Mesh spriteQuad;
 
+    private RenderContext renderContext;
     private SpriteRenderer spriteRenderer;
 
     private Camera2D camera;
@@ -101,6 +103,7 @@ public class GameEngine implements GLEventListener {
         spriteShader = new ShaderProgram(gl, "/shaders/sprite.vert", "/shaders/sprite.frag");
         fogShader = new ShaderProgram(gl, "/shaders/fog.vert", "/shaders/fog.frag");
         lighthouseShader = new ShaderProgram(gl, "/shaders/lighthouse.vert", "/shaders/lighthouse.frag");
+        treesShader = new ShaderProgram(gl, "/shaders/trees.vert", "/shaders/trees.frag");
 
         camera = new Camera2D(WIDTH, HEIGHT);
 
@@ -109,14 +112,6 @@ public class GameEngine implements GLEventListener {
                 -0.5f, -0.5f, 0f,
                 0.5f, -0.5f, 0f,
                 0.5f, 0.5f, 0f
-        };
-
-        float[] vertices = {
-                // x y z u v
-                -0.5f, 0.5f, 0f, 0f, 1f,
-                -0.5f, -0.5f, 0f, 0f, 0f,
-                0.5f, -0.5f, 0f, 1f, 0f,
-                0.5f, 0.5f, 0f, 1f, 1f
         };
 
         float[] spriteVertices = {
@@ -135,6 +130,11 @@ public class GameEngine implements GLEventListener {
         colorQuad = Mesh.getColorMesh(gl, shapeVertices, indices);
         spriteQuad = Mesh.getSpriteMesh(gl, spriteVertices, indices);
 
+        renderContext = new RenderContext();
+        renderContext.setCamera(camera);
+        renderContext.setMesh(spriteQuad);
+        renderContext.setShader(treesShader);
+
         spriteRenderer = new SpriteRenderer(spriteQuad);
 
         player = new Player();
@@ -149,6 +149,11 @@ public class GameEngine implements GLEventListener {
         npc.setMesh(colorQuad);
 
         islandScene = new IslandScene(colorQuad);
+        islandScene.setContext(renderContext);
+
+        Texture treesTexture = new Texture("/textures/trees.png");
+        Sprite treesSprite = new Sprite(treesTexture);
+        islandScene.setTreesSprite(treesSprite);
 
         Texture inactiveTexture = new Texture("/textures/inactive_lighthouse.png");
         Sprite inactiveSprite = new Sprite(inactiveTexture);

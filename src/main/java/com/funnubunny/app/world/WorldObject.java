@@ -1,29 +1,36 @@
 package com.funnubunny.app.world;
 
 import com.funnubunny.app.entity.Transform;
-import com.funnubunny.app.graphics.Camera2D;
-import com.funnubunny.app.graphics.Mesh;
-import com.funnubunny.app.graphics.Renderable;
-import com.funnubunny.app.graphics.ShaderProgram;
+import com.funnubunny.app.graphics.*;
 import com.jogamp.opengl.GL3;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @RequiredArgsConstructor
 public class WorldObject implements Renderable {
 
+    @Getter
     private final Transform transform;
 
     private final Mesh mesh;
 
+    @Getter
     private final float width;
+    @Getter
     private final float height;
 
     private final float r;
     private final float g;
     private final float b;
 
+    @Getter
     private final boolean affectedByLight;
+
+    @Getter
+    @Setter
+    private Sprite sprite;
 
     @Override
     public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {

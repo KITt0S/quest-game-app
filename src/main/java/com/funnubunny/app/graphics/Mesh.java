@@ -10,13 +10,21 @@ import java.nio.IntBuffer;
 import static com.jogamp.common.nio.Buffers.newDirectFloatBuffer;
 import static com.jogamp.common.nio.Buffers.newDirectIntBuffer;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Mesh {
+    private ShaderProgram shader;
+
     private int vaoId;
     private int vboId;
     private int eboId;
 
     private int indexCount;
+
+    public Mesh(int vaoId, int vboId, int eboId, int indexCount) {
+        this.vaoId = vaoId;
+        this.vboId = vboId;
+        this.eboId = eboId;
+        this.indexCount = indexCount;
+    }
 
     public static Mesh getColorMesh(GL3 gl, float[] vertices, int[] indices) {
         int indexCount = indices.length;
@@ -88,6 +96,16 @@ public class Mesh {
         gl.glBindVertexArray(0);
 
         return new Mesh(vaoId, vboId, eboId, indexCount);
+    }
+
+    public void useShader(ShaderProgram shader) {
+        this.shader = shader;
+    }
+
+    public void uploadTransform(GL3 gl, Camera2D camera, float x, float y, float width, float height) {
+        shader.setUniformMatrix4f(gl, "uProjectionView", camera.getProjectionView());
+        shader.setUniformVec2(gl, "uPosition", x, y);
+        shader.setUniformVec2(gl, "uScale", width, height);
     }
 
     public void render(GL3 gl) {

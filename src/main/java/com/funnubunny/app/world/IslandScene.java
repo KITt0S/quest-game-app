@@ -1,16 +1,17 @@
 package com.funnubunny.app.world;
 
-import com.funnubunny.app.graphics.Camera2D;
-import com.funnubunny.app.graphics.Mesh;
-import com.funnubunny.app.graphics.Renderable;
-import com.funnubunny.app.graphics.ShaderProgram;
+import com.funnubunny.app.graphics.*;
 import com.jogamp.opengl.GL3;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class IslandScene implements Renderable {
     private final List<WorldObject> worldObjects;
+
+    @Setter
+    private RenderContext context;
 
     private boolean lighthouseOn = false;
 
@@ -64,8 +65,8 @@ public class IslandScene implements Renderable {
                 .mesh(mesh)
                 .x(-260)
                 .y(-80)
-                .width(90)
-                .height(180)
+                .width(300)
+                .height(300)
                 .r(0.05f)
                 .g(0.18f)
                 .b(0.05f)
@@ -77,8 +78,8 @@ public class IslandScene implements Renderable {
                 .mesh(mesh)
                 .x(240)
                 .y(-40)
-                .width(90)
-                .height(180)
+                .width(300)
+                .height(300)
                 .r(0.05f)
                 .g(0.18f)
                 .b(0.05f)
@@ -88,14 +89,26 @@ public class IslandScene implements Renderable {
         worldObjects.addAll(List.of(islandGround, dock, generatorRuins, leftTrees, rightTrees));
     }
 
+    public void setTreesSprite(Sprite sprite) {
+        worldObjects.get(3).setSprite(sprite);
+        worldObjects.get(4).setSprite(sprite);
+    }
+
     public void setLighthouseOn(boolean lighthouseOn) {
         this.lighthouseOn = lighthouseOn;
+        context.setLighthouseOn(lighthouseOn);
     }
 
     @Override
     public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {
-        for (WorldObject element : worldObjects) {
-            element.render(gl, shader, camera, lighthouseOn);
+        for (int i = 0; i < worldObjects.size(); i++) {
+            if (i != 3 && i != 4) {
+                WorldObject element = worldObjects.get(i);
+                element.render(gl, shader, camera, lighthouseOn);
+                continue;
+            }
+
+            new WorldObjectRenderer().render(gl, worldObjects.get(i), context);
         }
     }
 }
