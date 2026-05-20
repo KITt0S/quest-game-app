@@ -19,7 +19,7 @@ public class WorldSystem {
     public void update() {
         QuestState state = ((GetQuestStateAnswer) commandBus.dispatch(new GetQuestStateCommand())).getQuestState();
 
-        boolean lighthouseOn = state == QuestState.REACHED_LIGHTHOUSE || state == QuestState.FINAL_CHOICE;
+        boolean lighthouseOn = state == QuestState.RELIGHT_ENDING;
 
         islandScene.setLighthouseOn(lighthouseOn);
 

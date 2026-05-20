@@ -65,7 +65,7 @@ public class InteractionSystem {
 
         boolean canInteract = distance < INTERACTION_DISTANCE;
 
-        if (canInteract && Input.isKeyPressed(KeyEvent.VK_E)) {
+        if (canInteract) {
 
             if (!dialogueBox.isActive()) {
 
@@ -85,8 +85,24 @@ public class InteractionSystem {
         }
     }
 
-    private void handleNoteInteraction() {
+    private void handleFirstNoteInteraction() {
         if (((GetQuestStateAnswer) commandBus.dispatch(new GetQuestStateCommand())).getQuestState() != QuestState.TALKED_TO_KEEPER) {
+            return;
+        }
+
+        for (Note note : notes) {
+            float distance = player.getPosition().distance(note.getPosition());
+
+            if (distance < INTERACTION_DISTANCE) {
+                note.interact();
+                eventBus.emit(new FirstNoteCollectedGameEvent());
+            }
+        }
+    }
+
+    private void handleNoteInteraction() {
+        QuestState questState = ((GetQuestStateAnswer) commandBus.dispatch(new GetQuestStateCommand())).getQuestState();
+        if (questState != QuestState.TALKED_TO_KEEPER && questState != QuestState.FOUND_FIRST_NOTE) {
             return;
         }
 
@@ -98,11 +114,9 @@ public class InteractionSystem {
 
             float distance = player.getPosition().distance(note.getPosition());
 
-            if (distance < INTERACTION_DISTANCE && Input.isKeyPressed(KeyEvent.VK_E)) {
+            if (distance < INTERACTION_DISTANCE) {
 
                 note.interact();
-
-                eventBus.emit(new FirstNoteCollectedGameEvent());
 
                 if (noteManager.hasEnoughClues()) {
                     eventBus.emit(new AllNotesFoundGameEvent());
@@ -154,6 +168,7 @@ public class InteractionSystem {
 
     public GameAnswer handle(InteractionCommand command) {
         handleNpcInteraction();
+        handleFirstNoteInteraction();
         handleNoteInteraction();
         return new VoidAnswer();
     }

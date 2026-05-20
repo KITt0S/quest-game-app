@@ -3,6 +3,7 @@ package com.funnubunny.app.input;
 import com.funnubunny.app.command.CommandBus;
 import com.funnubunny.app.command.DestroyLighthouseCommand;
 import com.funnubunny.app.command.InteractionCommand;
+import com.funnubunny.app.command.RelightLighthouseCommand;
 import com.funnubunny.app.core.Input;
 import com.jogamp.newt.event.KeyEvent;
 
@@ -20,6 +21,8 @@ public class InputSystem {
         pressedS();
         pressedD();
         pressedE();
+        pressedR();
+        pressedF();
     }
 
     public void pressedW() {}
@@ -37,6 +40,12 @@ public class InputSystem {
     }
 
     public void pressedR() {
+        if (Input.isKeyPressed(KeyEvent.VK_R)) {
+            commandBus.dispatch(new RelightLighthouseCommand());
+        }
+    }
+
+    public void pressedF() {
         if (Input.isKeyPressed(KeyEvent.VK_R)) {
             commandBus.dispatch(new DestroyLighthouseCommand());
         }
