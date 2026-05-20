@@ -20,9 +20,7 @@ public class WorldObjectRenderer {
                 worldObject.getTransform().getPosition().y(),
                 worldObject.getWidth(), worldObject.getHeight());
 
-        boolean value = context.isLighthouseOn() && worldObject.isAffectedByLight();
-        System.out.println(value);
-        shader.setUniformBool(gl, "uLighthouseOn", value);
+        shader.setUniformBool(gl, "uLighthouseOn", context.isLighthouseOn() && worldObject.isAffectedByLight());
 
         gl.glActiveTexture(GL3.GL_TEXTURE0);
         gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR);

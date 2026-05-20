@@ -1,11 +1,15 @@
 package com.funnubunny.app.core;
 
+import com.funnubunny.app.command.CommandBus;
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.graphics.*;
+import com.funnubunny.app.input.InputSystem;
 import com.funnubunny.app.interaction.InteractionSystem;
 import com.funnubunny.app.quest.*;
+import com.funnubunny.app.state.GameState;
+import com.funnubunny.app.state.GameStateSystem;
 import com.funnubunny.app.ui.DialogueBox;
 import com.funnubunny.app.ui.HUD;
 import com.funnubunny.app.world.*;
@@ -49,20 +53,25 @@ public class GameEngine implements GLEventListener {
     private IslandScene islandScene;
     private Lighthouse lighthouse;
 
+    private GameState gameState;
+
     private DialogueBox dialogueBox;
     private HUD hud;
 
+    private CommandBus commandBus;
+    private EventBus eventBus;
+
+    private GameStateSystem gameStateSystem;
+    private InputSystem inputSystem;
     private CameraSystem cameraSystem;
     private InteractionSystem interactionSystem;
+    private QuestSystem questSystem;
     private WorldSystem worldSystem;
     private NoteSystem noteSystem;
     private FogSystem fogSystem;
 
-    private QuestManager questManager;
     private NoteManager noteManager;
     private List<Note> notes;
-
-    private EventBus eventBus;
 
     public void start() {
         initializeWindow();
@@ -163,8 +172,6 @@ public class GameEngine implements GLEventListener {
         lighthouse.setMesh(spriteQuad);
         lighthouse.setSprites(inactiveSprite, activeSprite);
 
-        questManager = new QuestManager();
-
         dialogueBox = new DialogueBox();
         hud = new HUD();
 
@@ -212,14 +219,17 @@ public class GameEngine implements GLEventListener {
         notes.add(note2);
         notes.add(note3);
 
-        cameraSystem = new CameraSystem(camera, player);
+        gameState = new GameState();
 
+        commandBus = new CommandBus();
         eventBus = new EventBus();
-        eventBus.register(questManager);
 
-        interactionSystem = new InteractionSystem(player, npc, dialogueBox, notes, noteManager, questManager, lighthouse, eventBus);
-
-        worldSystem = new WorldSystem(questManager, islandScene, lighthouse);
+        gameStateSystem = new GameStateSystem(gameState, commandBus);
+        inputSystem = new InputSystem(commandBus);
+        cameraSystem = new CameraSystem(camera, player);
+        interactionSystem = new InteractionSystem(player, npc, dialogueBox, notes, noteManager, lighthouse, commandBus, eventBus);
+        questSystem = new QuestSystem(commandBus, eventBus);
+        worldSystem = new WorldSystem(commandBus, islandScene, lighthouse);
 
         noteSystem = new NoteSystem(notes);
     }
@@ -235,6 +245,7 @@ public class GameEngine implements GLEventListener {
     private void update() {
         handleGlobalInput();
         player.update();
+        inputSystem.update();
         interactionSystem.update();
         noteSystem.update();
         worldSystem.update();
