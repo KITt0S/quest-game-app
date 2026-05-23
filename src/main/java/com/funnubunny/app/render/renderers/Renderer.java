@@ -1,6 +1,5 @@
 package com.funnubunny.app.render.renderers;
 
-import com.funnubunny.app.render.Renderable;
 import com.funnubunny.app.world.WorldStateService;
 
 public abstract class Renderer implements Renderable {

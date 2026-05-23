@@ -1,4 +1,6 @@
-package com.funnubunny.app.render;
+package com.funnubunny.app.render.renderers;
+
+import com.funnubunny.app.render.RenderContext;
 
 public interface Renderable {
 

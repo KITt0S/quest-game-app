@@ -1,5 +1,6 @@
 package com.funnubunny.app.render;
 
+import com.funnubunny.app.render.renderers.Renderable;
 import com.jogamp.opengl.GL3;
 
 import java.util.ArrayList;

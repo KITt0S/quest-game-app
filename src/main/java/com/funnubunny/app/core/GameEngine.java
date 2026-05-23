@@ -7,13 +7,16 @@ import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.graphics.*;
+import com.funnubunny.app.graphics.text.BitmapFont;
 import com.funnubunny.app.input.InputSystem;
 import com.funnubunny.app.interaction.InteractionSystem;
 import com.funnubunny.app.note.Note;
 import com.funnubunny.app.note.NoteSystem;
 import com.funnubunny.app.quest.Dialogue;
 import com.funnubunny.app.quest.QuestSystem;
+import com.funnubunny.app.render.RenderContext;
 import com.funnubunny.app.render.RenderingSystem;
+import com.funnubunny.app.render.TextRenderer;
 import com.funnubunny.app.render.renderers.*;
 import com.funnubunny.app.state.GameState;
 import com.funnubunny.app.state.GameStateSystem;
@@ -42,6 +45,7 @@ public class GameEngine implements GLEventListener {
     private ShaderProgram fogShader;
     private ShaderProgram lighthouseShader;
     private ShaderProgram treesShader;
+    private ShaderProgram textShader;
 
     private Camera2D camera;
 
@@ -110,6 +114,7 @@ public class GameEngine implements GLEventListener {
         fogShader = new ShaderProgram(gl, "/shaders/fog.vert", "/shaders/fog.frag");
         lighthouseShader = new ShaderProgram(gl, "/shaders/lighthouse.vert", "/shaders/lighthouse.frag");
         treesShader = new ShaderProgram(gl, "/shaders/trees.vert", "/shaders/trees.frag");
+        textShader = new ShaderProgram(gl, "/shaders/text.vert", "/shaders/text.frag");
 
         camera = new Camera2D(WIDTH, HEIGHT);
 
@@ -162,6 +167,9 @@ public class GameEngine implements GLEventListener {
         notes.add(note2);
         notes.add(note3);
 
+        Texture fontTexture = new Texture("/textures/font.png");
+        BitmapFont bitmapFont = new BitmapFont(fontTexture);
+
         gameState = new GameState();
         WorldState worldState = new WorldState(player, npc, notes, lighthouse, islandScene, fogSystem);
 
@@ -188,6 +196,8 @@ public class GameEngine implements GLEventListener {
         renderingSystem.register(new IslandSceneRenderer(worldStateService, colorShader, treesShader));
         renderingSystem.register(new FogRenderer(worldStateService, fogShader));
         renderingSystem.register(new DialogueBoxRenderer(dialogueBox));
+
+        TextRenderer textRenderer = new TextRenderer(bitmapFont, textShader);
     }
 
     @Override
@@ -214,7 +224,7 @@ public class GameEngine implements GLEventListener {
     }
 
     private void render(GL3 gl) {
-        renderingSystem.render(new com.funnubunny.app.render.RenderContext(gl, camera));
+        renderingSystem.render(new RenderContext(gl, camera));
     }
 
     private void stop() {
