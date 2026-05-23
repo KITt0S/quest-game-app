@@ -113,26 +113,6 @@ public class GameEngine implements GLEventListener {
 
         camera = new Camera2D(WIDTH, HEIGHT);
 
-        float[] shapeVertices = {
-                -0.5f, 0.5f, 0f,
-                -0.5f, -0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                0.5f, 0.5f, 0f
-        };
-
-        float[] spriteVertices = {
-                // x y z u v
-                -0.5f, 0.5f, 0f, 0f, 1f,
-                -0.5f, -0.5f, 0f, 0f, 0f,
-                0.5f, -0.5f, 0f, 1f, 0f,
-                0.5f, 0.5f, 0f, 1f, 1f
-        };
-
-        int[] indices = {
-                0, 1, 2,
-                2, 3, 0
-        };
-
         player = new Player();
         player.setSprite(new Sprite(new Texture("/textures/player.png")));
 
