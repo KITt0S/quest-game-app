@@ -6,6 +6,7 @@ import com.funnubunny.app.command.commands.interaction.InteractionCommand;
 import com.funnubunny.app.command.commands.nextdialogue.NextDialogueCommand;
 import com.funnubunny.app.command.commands.relightlighthouse.RelightLighthouseCommand;
 import com.funnubunny.app.core.Input;
+import com.funnubunny.app.core.Time;
 import com.jogamp.newt.event.KeyEvent;
 
 public class InputSystem {
@@ -56,6 +57,7 @@ public class InputSystem {
     public void pressedSpace() {
         if (Input.isKeyPressed(KeyEvent.VK_SPACE)) {
             commandBus.dispatch(new NextDialogueCommand());
+            Input.releaseKey(KeyEvent.VK_SPACE);
         }
     }
 }

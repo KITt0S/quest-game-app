@@ -8,11 +8,24 @@ import java.util.Map;
 public class BitmapFont {
     private final Texture texture;
 
+    private final char[][] chars = {
+            {'z', '{', '|', '}', '~' },
+            {'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y'},
+            {'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o'},
+            {'\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e'},
+            {'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '['},
+            {'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'},
+            {'>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G'},
+            {'4', '5', '6', '7', '8', '9', ':', ';', '<', '='},
+            {'*', '+', ',', '-', '.', '/', '0', '1', '2', '3'},
+            {' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')'},
+    };
+
     private final Map<Character, Glyph> glyphs =
             new HashMap<>();
 
-    private static final int COLUMNS = 16;
-    private static final int ROWS = 16;
+    private static final int COLUMNS = 10;
+    private static final int ROWS = 10;
 
     public BitmapFont(Texture texture) {
 
@@ -23,10 +36,14 @@ public class BitmapFont {
 
     private void generateAsciiGlyphs() {
 
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < 100; i++) {
 
-            int x = i % COLUMNS;
-            int y = i / COLUMNS;
+            int x = i % ROWS;
+            int y = i / ROWS;
+
+            if (y == 0 && x > 4) {
+                continue;
+            }
 
             float u0 = x / (float) COLUMNS;
             float v0 = y / (float) ROWS;
@@ -34,7 +51,7 @@ public class BitmapFont {
             float u1 = (x + 1) / (float) COLUMNS;
             float v1 = (y + 1) / (float) ROWS;
 
-            glyphs.put((char) i, new Glyph(u0, v0, u1, v1));
+            glyphs.put(chars[y][x], new Glyph(u0, v0, u1, v1));
         }
     }
 

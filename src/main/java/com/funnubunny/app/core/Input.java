@@ -31,4 +31,8 @@ public class Input implements KeyListener {
     public static boolean isKeyPressed(short keyCode) {
         return pressedKeys.contains(keyCode);
     }
+
+    public static void releaseKey(short keyCode) {
+        pressedKeys.remove(keyCode);
+    }
 }

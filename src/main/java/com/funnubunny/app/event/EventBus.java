@@ -12,10 +12,15 @@ public class EventBus {
 
     @SuppressWarnings("unchecked")
     public <T extends GameEvent> void emit(T event) {
-        List<EventListener<?>> listeners = this.listeners.getOrDefault(event.getClass(), Collections.emptyList());
+        for (Map.Entry<Class<?>, List<EventListener<?>>> entry : listeners.entrySet()) {
 
-        for (EventListener<?> listener : listeners) {
-            ((EventListener<T>) listener).onEvent(event);
+            Class<?> listenerType = entry.getKey();
+
+            if (listenerType.isAssignableFrom(event.getClass())) {
+                for (EventListener<?> listener : entry.getValue()) {
+                    ((EventListener<T>) listener).onEvent(event);
+                }
+            }
         }
     }
 

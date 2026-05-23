@@ -5,6 +5,7 @@ import com.funnubunny.app.graphics.text.BitmapFont;
 import com.funnubunny.app.graphics.text.Glyph;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL3;
+import org.joml.Matrix4f;
 
 import java.nio.FloatBuffer;
 
@@ -17,7 +18,7 @@ public class TextRenderer {
     private int vao;
     private int vbo;
 
-    private static final float GLYPH_SIZE = 24f;
+    private static final float GLYPH_SIZE = 50f;
 
     public TextRenderer(
             GL3 gl,
@@ -86,9 +87,12 @@ public class TextRenderer {
             float y) {
 
         shader.use(gl);
-
+        shader.setUniformMatrix4f(gl, "uProjection", new Matrix4f().ortho2D(0, 1280, 0, 720));
+        gl.glActiveTexture(GL3.GL_TEXTURE0);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR);
+        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR);
         font.getTexture().bind(gl);
-
+        shader.setUniformInt(gl, "uTexture", 0);
         gl.glBindVertexArray(vao);
 
         float cursorX = x;
@@ -97,7 +101,7 @@ public class TextRenderer {
 
             if (c == '\n') {
 
-                y -= GLYPH_SIZE;
+                y -= 40f;
 
                 cursorX = x;
 
@@ -114,7 +118,7 @@ public class TextRenderer {
                     y
             );
 
-            cursorX += GLYPH_SIZE * 0.65f;
+            cursorX += 20f;
         }
 
         gl.glBindVertexArray(0);

@@ -151,11 +151,11 @@ public class GameEngine implements GLEventListener {
         Texture noteTexture = new Texture("/textures/note.png");
         Sprite noteSprite = new Sprite(noteTexture);
 
-        Note note1 = new Note("Fog swallowed the northern ship. The light was already awake.");
+        Note note1 = new Note("Fog swallowed the northern ship.\nThe light was already awake.");
         note1.setSprite(noteSprite);
         note1.getTransform().setPosition(-350, 120);
 
-        Note note2 = new Note("Keeper says the light protects us. Then why do the bells ring underwater?");
+        Note note2 = new Note("Keeper says the light protects us.\nThen why do the bells ring underwater?");
         note2.setSprite(noteSprite);
         note2.getTransform().setPosition(250, -180);
 
@@ -178,7 +178,7 @@ public class GameEngine implements GLEventListener {
         commandBus = new CommandBus();
         eventBus = new EventBus();
 
-        gameStateSystem = new GameStateSystem(gameState, commandBus);
+        gameStateSystem = new GameStateSystem(gameState, commandBus, eventBus);
         inputSystem = new InputSystem(commandBus);
         cameraSystem = new CameraSystem(camera, player);
         interactionSystem = new InteractionSystem(commandBus, eventBus, worldStateService);
@@ -186,6 +186,8 @@ public class GameEngine implements GLEventListener {
         questSystem = new QuestSystem(commandBus, eventBus);
         dialogueBoxSystem = new DialogueBoxSystem(dialogueBox, commandBus);
         worldSystem = new WorldStateSystem(worldState, eventBus);
+
+        TextRenderer textRenderer = new TextRenderer(gl, bitmapFont, textShader);
 
         renderingSystem = new RenderingSystem();
 
@@ -195,9 +197,8 @@ public class GameEngine implements GLEventListener {
         renderingSystem.register(new NoteRenderer(worldStateService, spriteShader));
         renderingSystem.register(new IslandSceneRenderer(worldStateService, colorShader, treesShader));
         renderingSystem.register(new FogRenderer(worldStateService, fogShader));
-        renderingSystem.register(new DialogueBoxRenderer(dialogueBox));
-
-        TextRenderer textRenderer = new TextRenderer(bitmapFont, textShader);
+        renderingSystem.register(new DialogueBoxRenderer(dialogueBox, textRenderer));
+        renderingSystem.register(new EventRenderer(textRenderer, eventBus));
     }
 
     @Override

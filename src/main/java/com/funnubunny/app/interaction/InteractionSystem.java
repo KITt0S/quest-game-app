@@ -82,6 +82,7 @@ public class InteractionSystem {
             if (distance < INTERACTION_DISTANCE) {
                 commandBus.dispatch(new CollectNoteCommand(note.getId()));
                 eventBus.emit(new FirstNoteCollectedGameEvent());
+                eventBus.emit(new NoteCollectedEvent(note.getText()));
             }
         }
     }
@@ -105,6 +106,8 @@ public class InteractionSystem {
             if (distance < INTERACTION_DISTANCE) {
 
                 commandBus.dispatch(new CollectNoteCommand(note.getId()));
+                eventBus.emit(new NoteCollectedEvent(note.getText()));
+
                 IsEnoughCluesAnswer isEnoughCluesAnswer = commandBus.dispatch(new IsEnoughCluesCommand());
 
                 if (isEnoughCluesAnswer.isEnoughClues()) {
@@ -131,11 +134,6 @@ public class InteractionSystem {
             return;
         }
 
-        System.out.println();
-        System.out.println("The lighthouse mechanism vibrates softly...");
-        System.out.println("Press R to relight");
-        System.out.println("Press F to destroy");
-
         eventBus.emit(new ReachedLighthouseEvent());
     }
 
@@ -144,8 +142,6 @@ public class InteractionSystem {
         if (getQuestStateAnswer.getQuestState() != QuestState.REACHED_LIGHTHOUSE) {
             return;
         }
-
-        System.out.println("Lighthouse is relighted");
 
         eventBus.emit(new RelightedLighthouseEvent());
     }

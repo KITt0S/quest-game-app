@@ -19,11 +19,11 @@ public class DialogueBoxRenderer implements Renderable {
             return;
         }
 
-        textRenderer.render(context.getGl(), dialogueBox.getDialogue().getCurrentLine(), 0, 0);
+        textRenderer.renderText(context.getGl(), dialogueBox.getDialogue().getCurrentLine(), 0, 0);
     }
 
     @Override
     public int priority() {
-        return 0;
+        return 300;
     }
 }
