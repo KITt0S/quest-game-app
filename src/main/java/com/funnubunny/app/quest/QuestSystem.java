@@ -1,8 +1,9 @@
 package com.funnubunny.app.quest;
 
-import com.funnubunny.app.command.ChangeQuestStateCommand;
+import com.funnubunny.app.command.commands.changequeststate.ChangeQuestStateCommand;
 import com.funnubunny.app.command.CommandBus;
 import com.funnubunny.app.event.*;
+import com.funnubunny.app.event.events.*;
 
 public class QuestSystem {
 

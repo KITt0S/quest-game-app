@@ -2,7 +2,9 @@ package com.funnubunny.app.world;
 
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
-import com.funnubunny.app.quest.NoteSystem;
+import com.funnubunny.app.quest.Note;
+
+import java.util.List;
 
 public class WorldStateService {
 
@@ -24,11 +26,19 @@ public class WorldStateService {
         return worldState.getLighthouse();
     }
 
-    public NoteSystem getNoteSystem() {
-        return worldState.getNoteSystem();
+    public List<Note> getNotes() {
+        return worldState.getNotes();
     }
 
     public IslandScene getIslandScene() {
         return worldState.getIslandScene();
+    }
+
+    public FogSystem getFogSystem() {
+        return worldState.getFogSystem();
+    }
+
+    public Note getNoteById(String id) {
+        return worldState.getNotes().stream().filter(note -> note.getId().equals(id)).findFirst().orElse(null);
     }
 }

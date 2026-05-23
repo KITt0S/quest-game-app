@@ -1,15 +1,12 @@
 package com.funnubunny.app.world;
 
 import com.funnubunny.app.entity.Transform;
-import com.funnubunny.app.graphics.Camera2D;
-import com.funnubunny.app.graphics.ShaderProgram;
 import com.funnubunny.app.graphics.Sprite;
-import com.funnubunny.app.graphics.SpriteRenderer;
-import com.jogamp.opengl.GL3;
+import lombok.Getter;
 
+@Getter
 public class FogLayer {
     private final Transform transform;
-
     private final Sprite sprite;
 
     private final float width;
@@ -31,10 +28,6 @@ public class FogLayer {
         if (transform.getPosition().x > 200) {
             transform.setPosition(-200, transform.getPosition().y);
         }
-    }
-
-    public void render(GL3 gl, ShaderProgram shader, Camera2D camera, SpriteRenderer renderer) {
-        renderer.render(gl, shader, camera, sprite, transform, width, height);
     }
 
     public static FogLayerBuilder builder() {

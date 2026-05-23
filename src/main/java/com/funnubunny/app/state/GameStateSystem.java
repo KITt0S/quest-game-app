@@ -1,7 +1,10 @@
 package com.funnubunny.app.state;
 
 import com.funnubunny.app.command.*;
-import com.funnubunny.app.event.EventBus;
+import com.funnubunny.app.command.commands.*;
+import com.funnubunny.app.command.commands.changequeststate.ChangeQuestStateCommand;
+import com.funnubunny.app.command.commands.getqueststate.GetQuestStateAnswer;
+import com.funnubunny.app.command.commands.getqueststate.GetQuestStateCommand;
 import com.funnubunny.app.quest.QuestState;
 
 public class GameStateSystem {
@@ -15,6 +18,7 @@ public class GameStateSystem {
 
     public GameAnswer changeQuestState(ChangeQuestStateCommand command) {
         gameState.set(GameState.GameStateKey.QUEST_STATE, command.getQuestState().name());
+        System.out.println("[QUEST UPDATED]: " + command.getQuestState().name());
         return new VoidAnswer();
     }
 

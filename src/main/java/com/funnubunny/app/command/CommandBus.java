@@ -1,5 +1,8 @@
 package com.funnubunny.app.command;
 
+import com.funnubunny.app.command.commands.GameAnswer;
+import com.funnubunny.app.command.commands.GameCommand;
+
 import java.util.HashMap;
 import java.util.Map;
 

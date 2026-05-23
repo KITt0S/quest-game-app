@@ -1,40 +1,28 @@
 package com.funnubunny.app.quest;
 
 import com.funnubunny.app.entity.Entity;
-import com.funnubunny.app.graphics.Camera2D;
-import com.funnubunny.app.graphics.ShaderProgram;
-import com.jogamp.opengl.GL3;
 import org.joml.Vector2f;
 
-public class Note extends Entity implements Interactable {
+import java.util.UUID;
 
-    private final Clue clue;
+public class Note extends Entity implements Interactable {
+    private final String id = UUID.randomUUID().toString();
+
+    private final String text;
 
     private boolean collected = false;
 
-    public Note(Clue clue) {
-        this.clue = clue;
+    public Note(String text) {
+        this.text = text;
         setSize(20, 20);
     }
 
-    @Override
-    public void update() {
-
+    public String getId() {
+        return id;
     }
 
     @Override
     public void interact() {
-        if (collected) {
-            return;
-        }
-
-        collected = true;
-
-        clue.discover();
-
-        System.out.println("\n--- FOUND NOTE ---");
-        System.out.println(clue.getText());
-        System.out.println("------------------\n");
     }
 
     public boolean isCollected() {
@@ -45,12 +33,11 @@ public class Note extends Entity implements Interactable {
         return transform.getPosition();
     }
 
-    @Override
-    public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {
-        if (sprite == null || spriteRenderer == null) {
-            return;
-        }
+    public void collect() {
+        collected = true;
+    }
 
-        spriteRenderer.render(gl, shader, camera, sprite, transform, width, height);
+    public String getText() {
+        return text;
     }
 }

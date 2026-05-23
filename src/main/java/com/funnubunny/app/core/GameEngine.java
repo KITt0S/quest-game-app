@@ -1,18 +1,20 @@
 package com.funnubunny.app.core;
 
 import com.funnubunny.app.command.CommandBus;
+import com.funnubunny.app.dialoguebox.DialogueBoxSystem;
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.graphics.*;
-import com.funnubunny.app.graphics.RenderContext;
 import com.funnubunny.app.input.InputSystem;
 import com.funnubunny.app.interaction.InteractionSystem;
+import com.funnubunny.app.note.NoteSystem;
 import com.funnubunny.app.quest.*;
 import com.funnubunny.app.render.*;
+import com.funnubunny.app.render.renderers.*;
 import com.funnubunny.app.state.GameState;
 import com.funnubunny.app.state.GameStateSystem;
-import com.funnubunny.app.ui.DialogueBox;
+import com.funnubunny.app.dialoguebox.DialogueBox;
 import com.funnubunny.app.ui.HUD;
 import com.funnubunny.app.world.*;
 import com.jogamp.newt.event.KeyEvent;
@@ -45,8 +47,6 @@ public class GameEngine implements GLEventListener {
     private Mesh colorQuad;
     private Mesh spriteQuad;
 
-    private SpriteRenderer spriteRenderer;
-
     private Camera2D camera;
 
     private Player player;
@@ -66,16 +66,14 @@ public class GameEngine implements GLEventListener {
     private InputSystem inputSystem;
     private CameraSystem cameraSystem;
     private InteractionSystem interactionSystem;
+    private NoteSystem noteSystem;
     private QuestSystem questSystem;
     private WorldStateSystem worldSystem;
-    private NoteSystem noteSystem;
     private FogSystem fogSystem;
+    private DialogueBoxSystem dialogueBoxSystem;
     private RenderingSystem renderingSystem;
 
     private WorldStateService worldStateService;
-
-    private NoteManager noteManager;
-    private List<Note> notes;
 
     public void start() {
         initializeWindow();
@@ -142,18 +140,15 @@ public class GameEngine implements GLEventListener {
 
         colorQuad = Mesh.getColorMesh(gl, shapeVertices, indices);
         spriteQuad = Mesh.getSpriteMesh(gl, spriteVertices, indices);
-        spriteRenderer = new SpriteRenderer(spriteQuad);
 
         player = new Player();
         player.setSprite(new Sprite(new Texture("/textures/player.png")));
-        player.setSpriteRenderer(spriteRenderer);
 
         npc = new NPC("Old Keeper",
                 new Dialogue(List.of(
                         "The lighthouse went dark...",
                         "Something is wrong in the fog.",
                         "Find the power source.")));
-        npc.setMesh(colorQuad);
 
         islandScene = new IslandScene(colorQuad);
 
@@ -166,7 +161,6 @@ public class GameEngine implements GLEventListener {
         Texture activeTexture = new Texture("/textures/active_lighthouse.png");
         Sprite activeSprite = new Sprite(activeTexture);
         lighthouse = new Lighthouse();
-        lighthouse.setMesh(spriteQuad);
         lighthouse.setSprites(inactiveSprite, activeSprite);
 
         dialogueBox = new DialogueBox();
@@ -174,42 +168,23 @@ public class GameEngine implements GLEventListener {
 
         Texture fogTexture = new Texture("/textures/fog.png");
         Sprite fogSprite = new Sprite(fogTexture);
-        fogSystem = new FogSystem(fogSprite, spriteRenderer, fogShader);
+        fogSystem = new FogSystem(fogSprite);
 
-        noteManager = new NoteManager();
-        notes = new ArrayList<>();
+        List<Note> notes = new ArrayList<>();
 
         Texture noteTexture = new Texture("/textures/note.png");
         Sprite noteSprite = new Sprite(noteTexture);
 
-        Clue clue1 = new Clue(
-                "Fog swallowed the northern ship. " +
-                        "The light was already awake.");
-
-        noteManager.addClue(clue1);
-
-        Clue clue2 = new Clue(
-                "Keeper says the light protects us. " +
-                        "Then why do the bells ring underwater?");
-        noteManager.addClue(clue2);
-
-        Clue clue3 = new Clue(
-                "Do not let him relight the tower.");
-        noteManager.addClue(clue3);
-
-        Note note1 = new Note(clue1);
+        Note note1 = new Note("Fog swallowed the northern ship. The light was already awake.");
         note1.setSprite(noteSprite);
-        note1.setSpriteRenderer(spriteRenderer);
         note1.getTransform().setPosition(-350, 120);
 
-        Note note2 = new Note(clue2);
+        Note note2 = new Note("Keeper says the light protects us. Then why do the bells ring underwater?");
         note2.setSprite(noteSprite);
-        note2.setSpriteRenderer(spriteRenderer);
         note2.getTransform().setPosition(250, -180);
 
-        Note note3 = new Note(clue3);
+        Note note3 = new Note("Do not let him relight the tower.");
         note3.setSprite(noteSprite);
-        note3.setSpriteRenderer(spriteRenderer);
         note3.getTransform().setPosition(420, 260);
 
         notes.add(note1);
@@ -217,6 +192,9 @@ public class GameEngine implements GLEventListener {
         notes.add(note3);
 
         gameState = new GameState();
+        WorldState worldState = new WorldState(player, npc, notes, lighthouse, islandScene, fogSystem);
+
+        worldStateService = new WorldStateService(worldState);
 
         commandBus = new CommandBus();
         eventBus = new EventBus();
@@ -224,13 +202,11 @@ public class GameEngine implements GLEventListener {
         gameStateSystem = new GameStateSystem(gameState, commandBus);
         inputSystem = new InputSystem(commandBus);
         cameraSystem = new CameraSystem(camera, player);
-        interactionSystem = new InteractionSystem(player, npc, dialogueBox, notes, noteManager, lighthouse, commandBus, eventBus);
+        interactionSystem = new InteractionSystem(commandBus, eventBus, worldStateService);
+        noteSystem = new NoteSystem(commandBus, worldStateService);
         questSystem = new QuestSystem(commandBus, eventBus);
-        noteSystem = new NoteSystem(notes);
-
-        WorldState worldState = new WorldState(player, npc, lighthouse, islandScene, fogSystem, noteSystem);
-        worldSystem = new WorldStateSystem(eventBus, worldState);
-        worldStateService = new WorldStateService(worldState);
+        dialogueBoxSystem = new DialogueBoxSystem(dialogueBox, commandBus);
+        worldSystem = new WorldStateSystem(worldState, eventBus);
 
         renderingSystem = new RenderingSystem();
 
@@ -239,6 +215,8 @@ public class GameEngine implements GLEventListener {
         renderingSystem.register(new LighthouseRenderer(worldStateService, lighthouseShader));
         renderingSystem.register(new NoteRenderer(worldStateService, spriteShader));
         renderingSystem.register(new IslandSceneRenderer(worldStateService, colorShader, treesShader));
+        renderingSystem.register(new FogRenderer(worldStateService, fogShader));
+        renderingSystem.register(new DialogueBoxRenderer(dialogueBox));
     }
 
     @Override
@@ -254,7 +232,6 @@ public class GameEngine implements GLEventListener {
         player.update();
         inputSystem.update();
         interactionSystem.update();
-        noteSystem.update();
         cameraSystem.update();
         fogSystem.update(Time.getDeltaTime());
     }
@@ -266,10 +243,7 @@ public class GameEngine implements GLEventListener {
     }
 
     private void render(GL3 gl) {
-        gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         renderingSystem.render(new com.funnubunny.app.render.RenderContext(gl, camera));
-        fogSystem.render(gl, camera);
-        dialogueBox.render(gl);
         hud.render(gl);
     }
 

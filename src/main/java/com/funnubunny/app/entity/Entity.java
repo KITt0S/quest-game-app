@@ -2,15 +2,13 @@ package com.funnubunny.app.entity;
 
 import com.funnubunny.app.graphics.*;
 import com.jogamp.opengl.GL3;
+import lombok.Getter;
 
 public abstract class Entity {
 
     protected final Transform transform;
 
-    protected Mesh mesh;
-
     protected Sprite sprite;
-    protected SpriteRenderer spriteRenderer;
 
     protected float width = 50f;
     protected float height = 50f;
@@ -25,10 +23,6 @@ public abstract class Entity {
 
     public Transform getTransform() {
         return transform;
-    }
-
-    public void setMesh(Mesh mesh) {
-        this.mesh = mesh;
     }
 
     public void setSize(float width, float height) {
@@ -58,11 +52,11 @@ public abstract class Entity {
         this.sprite = sprite;
     }
 
-    public void setSpriteRenderer(SpriteRenderer spriteRenderer) {
-        this.spriteRenderer = spriteRenderer;
+    public Sprite getSprite() {
+        return sprite;
     }
 
-    public abstract void update();
+    public void update() {}
 
     public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {}
 }

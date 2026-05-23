@@ -1,9 +1,10 @@
 package com.funnubunny.app.input;
 
-import com.funnubunny.app.command.CommandBus;
-import com.funnubunny.app.command.DestroyLighthouseCommand;
-import com.funnubunny.app.command.InteractionCommand;
-import com.funnubunny.app.command.RelightLighthouseCommand;
+import com.funnubunny.app.command.*;
+import com.funnubunny.app.command.commands.destroylighthouse.DestroyLighthouseCommand;
+import com.funnubunny.app.command.commands.interaction.InteractionCommand;
+import com.funnubunny.app.command.commands.nextdialogue.NextDialogueCommand;
+import com.funnubunny.app.command.commands.relightlighthouse.RelightLighthouseCommand;
 import com.funnubunny.app.core.Input;
 import com.jogamp.newt.event.KeyEvent;
 
@@ -23,6 +24,7 @@ public class InputSystem {
         pressedE();
         pressedR();
         pressedF();
+        pressedSpace();
     }
 
     public void pressedW() {}
@@ -48,6 +50,12 @@ public class InputSystem {
     public void pressedF() {
         if (Input.isKeyPressed(KeyEvent.VK_R)) {
             commandBus.dispatch(new DestroyLighthouseCommand());
+        }
+    }
+
+    public void pressedSpace() {
+        if (Input.isKeyPressed(KeyEvent.VK_SPACE)) {
+            commandBus.dispatch(new NextDialogueCommand());
         }
     }
 }
