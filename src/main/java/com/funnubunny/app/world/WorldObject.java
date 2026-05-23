@@ -2,7 +2,6 @@ package com.funnubunny.app.world;
 
 import com.funnubunny.app.entity.Transform;
 import com.funnubunny.app.graphics.*;
-import com.jogamp.opengl.GL3;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -12,8 +11,6 @@ public class WorldObject {
 
     @Getter
     private final Transform transform;
-
-    private final Mesh mesh;
 
     @Getter
     private final float width;
@@ -40,7 +37,6 @@ public class WorldObject {
     }
 
     public static class WorldObjectBuilder {
-        private Mesh mesh;
 
         private float x;
         private float y;
@@ -53,11 +49,6 @@ public class WorldObject {
         private float b;
 
         private boolean affectedByLight;
-
-        public WorldObjectBuilder mesh(Mesh mesh) {
-            this.mesh = mesh;
-            return this;
-        }
 
         public WorldObjectBuilder x(float x) {
             this.x = x;
@@ -102,7 +93,7 @@ public class WorldObject {
         public WorldObject build() {
             Transform transform = new Transform();
             transform.setPosition(x, y);
-            return new WorldObject(transform, mesh, width, height, r, g, b, affectedByLight);
+            return new WorldObject(transform, width, height, r, g, b, affectedByLight);
         }
     }
 }

@@ -1,11 +1,11 @@
-package com.funnubunny.app.quest;
+package com.funnubunny.app.note;
 
 import com.funnubunny.app.entity.Entity;
 import org.joml.Vector2f;
 
 import java.util.UUID;
 
-public class Note extends Entity implements Interactable {
+public class Note extends Entity {
     private final String id = UUID.randomUUID().toString();
 
     private final String text;
@@ -19,10 +19,6 @@ public class Note extends Entity implements Interactable {
 
     public String getId() {
         return id;
-    }
-
-    @Override
-    public void interact() {
     }
 
     public boolean isCollected() {

@@ -2,7 +2,7 @@ package com.funnubunny.app.world;
 
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
-import com.funnubunny.app.quest.Note;
+import com.funnubunny.app.note.Note;
 
 import java.util.List;
 

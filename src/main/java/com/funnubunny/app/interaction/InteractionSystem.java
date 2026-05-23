@@ -17,7 +17,7 @@ import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.event.*;
 import com.funnubunny.app.event.events.*;
-import com.funnubunny.app.quest.Note;
+import com.funnubunny.app.note.Note;
 import com.funnubunny.app.quest.QuestState;
 import com.funnubunny.app.world.Lighthouse;
 import com.funnubunny.app.world.WorldStateService;

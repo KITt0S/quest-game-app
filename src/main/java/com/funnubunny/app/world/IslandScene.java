@@ -1,8 +1,6 @@
 package com.funnubunny.app.world;
 
 import com.funnubunny.app.graphics.*;
-import com.jogamp.opengl.GL3;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,17 +9,14 @@ public class IslandScene {
 
     private final List<WorldObject> worldObjects;
 
-    private boolean lighthouseOn = false;
-
-    public IslandScene(Mesh quadMesh) {
+    public IslandScene() {
         worldObjects = new ArrayList<>();
-        createWorld(quadMesh);
+        createWorld();
     }
 
-    private void createWorld(Mesh mesh) {
+    private void createWorld() {
         WorldObject islandGround = WorldObject
                 .builder()
-                .mesh(mesh)
                 .x(0)
                 .y(0)
                 .width(900)
@@ -34,7 +29,6 @@ public class IslandScene {
 
         WorldObject dock = WorldObject
                 .builder()
-                .mesh(mesh)
                 .x(0)
                 .y(-320)
                 .width(220)
@@ -47,7 +41,6 @@ public class IslandScene {
 
         WorldObject generatorRuins = WorldObject
                 .builder()
-                .mesh(mesh)
                 .x(0)
                 .y(40)
                 .width(150)
@@ -60,7 +53,6 @@ public class IslandScene {
 
         WorldObject leftTrees = WorldObject
                 .builder()
-                .mesh(mesh)
                 .x(-260)
                 .y(-80)
                 .width(300)
@@ -73,7 +65,6 @@ public class IslandScene {
 
         WorldObject rightTrees = WorldObject
                 .builder()
-                .mesh(mesh)
                 .x(240)
                 .y(-40)
                 .width(300)

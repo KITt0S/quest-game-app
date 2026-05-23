@@ -6,7 +6,6 @@ import com.funnubunny.app.command.commands.isenoughclues.IsEnoughCluesAnswer;
 import com.funnubunny.app.command.commands.isenoughclues.IsEnoughCluesCommand;
 import com.funnubunny.app.command.commands.VoidAnswer;
 import com.funnubunny.app.command.commands.collectnote.CollectNoteCommand;
-import com.funnubunny.app.quest.Note;
 import com.funnubunny.app.world.WorldStateService;
 
 public class NoteSystem {

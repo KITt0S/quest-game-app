@@ -1,6 +1,7 @@
 package com.funnubunny.app.core;
 
 import com.funnubunny.app.command.CommandBus;
+import com.funnubunny.app.dialoguebox.DialogueBox;
 import com.funnubunny.app.dialoguebox.DialogueBoxSystem;
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
@@ -8,13 +9,14 @@ import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.graphics.*;
 import com.funnubunny.app.input.InputSystem;
 import com.funnubunny.app.interaction.InteractionSystem;
+import com.funnubunny.app.note.Note;
 import com.funnubunny.app.note.NoteSystem;
-import com.funnubunny.app.quest.*;
-import com.funnubunny.app.render.*;
+import com.funnubunny.app.quest.Dialogue;
+import com.funnubunny.app.quest.QuestSystem;
+import com.funnubunny.app.render.RenderingSystem;
 import com.funnubunny.app.render.renderers.*;
 import com.funnubunny.app.state.GameState;
 import com.funnubunny.app.state.GameStateSystem;
-import com.funnubunny.app.dialoguebox.DialogueBox;
 import com.funnubunny.app.ui.HUD;
 import com.funnubunny.app.world.*;
 import com.jogamp.newt.event.KeyEvent;
@@ -31,8 +33,6 @@ public class GameEngine implements GLEventListener {
     private static final int HEIGHT = 720;
     private static final int FPS = 60;
 
-    private static final float INTERACTION_DISTANCE = 60f;
-
     private GLWindow window;
     private FPSAnimator animator;
 
@@ -43,9 +43,6 @@ public class GameEngine implements GLEventListener {
     private ShaderProgram fogShader;
     private ShaderProgram lighthouseShader;
     private ShaderProgram treesShader;
-
-    private Mesh colorQuad;
-    private Mesh spriteQuad;
 
     private Camera2D camera;
 
@@ -90,6 +87,7 @@ public class GameEngine implements GLEventListener {
         window = GLWindow.create(capabilities);
         window.setSize(WIDTH, HEIGHT);
         window.setTitle("The Last Lighthouse");
+        window.setFullscreen(true);
         window.setResizable(true);
         window.setVisible(true);
         window.addGLEventListener(this);
@@ -138,9 +136,6 @@ public class GameEngine implements GLEventListener {
                 2, 3, 0
         };
 
-        colorQuad = Mesh.getColorMesh(gl, shapeVertices, indices);
-        spriteQuad = Mesh.getSpriteMesh(gl, spriteVertices, indices);
-
         player = new Player();
         player.setSprite(new Sprite(new Texture("/textures/player.png")));
 
@@ -150,7 +145,7 @@ public class GameEngine implements GLEventListener {
                         "Something is wrong in the fog.",
                         "Find the power source.")));
 
-        islandScene = new IslandScene(colorQuad);
+        islandScene = new IslandScene();
 
         Texture treesTexture = new Texture("/textures/trees.png");
         Sprite treesSprite = new Sprite(treesTexture);
@@ -269,16 +264,24 @@ public class GameEngine implements GLEventListener {
     public void dispose(GLAutoDrawable drawable) {
         GL3 gl = drawable.getGL().getGL3();
 
-        if (colorQuad != null) {
-            colorQuad.delete(gl);
-        }
-
-        if (spriteQuad != null) {
-            spriteQuad.delete(gl);
-        }
-
         if (colorShader != null) {
             colorShader.delete(gl);
+        }
+
+        if (spriteShader != null) {
+            spriteShader.delete(gl);
+        }
+
+        if (lighthouseShader != null) {
+            lighthouseShader.delete(gl);
+        }
+
+        if (fogShader != null) {
+            fogShader.delete(gl);
+        }
+
+        if (treesShader != null) {
+            treesShader.delete(gl);
         }
 
         if (animator != null) {

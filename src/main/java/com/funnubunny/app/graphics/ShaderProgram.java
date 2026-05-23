@@ -1,8 +1,6 @@
 package com.funnubunny.app.graphics;
 
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
-import org.joml.Matrix2f;
 import org.joml.Matrix4f;
 
 import java.io.BufferedReader;

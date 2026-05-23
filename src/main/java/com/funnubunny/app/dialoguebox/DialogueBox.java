@@ -1,7 +1,6 @@
 package com.funnubunny.app.dialoguebox;
 
 import com.funnubunny.app.quest.Dialogue;
-import com.jogamp.opengl.GL3;
 import lombok.Getter;
 
 @Getter

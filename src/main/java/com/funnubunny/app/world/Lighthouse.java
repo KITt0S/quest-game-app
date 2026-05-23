@@ -1,10 +1,7 @@
 package com.funnubunny.app.world;
 
 import com.funnubunny.app.entity.Entity;
-import com.funnubunny.app.graphics.Camera2D;
-import com.funnubunny.app.graphics.ShaderProgram;
 import com.funnubunny.app.graphics.Sprite;
-import com.jogamp.opengl.GL3;
 import org.joml.Vector2f;
 
 public class Lighthouse extends Entity {
@@ -33,11 +30,6 @@ public class Lighthouse extends Entity {
 
     public Sprite[] getSprites() {
         return sprites;
-    }
-
-    @Override
-    public void update() {
-
     }
 
     public Vector2f getPosition() {

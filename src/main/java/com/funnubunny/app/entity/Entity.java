@@ -2,7 +2,6 @@ package com.funnubunny.app.entity;
 
 import com.funnubunny.app.graphics.*;
 import com.jogamp.opengl.GL3;
-import lombok.Getter;
 
 public abstract class Entity {
 

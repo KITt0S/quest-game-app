@@ -2,7 +2,6 @@ package com.funnubunny.app.graphics;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
 
 public class Camera2D {
     private final Matrix4f projection;
