@@ -5,9 +5,11 @@ import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.graphics.*;
+import com.funnubunny.app.graphics.RenderContext;
 import com.funnubunny.app.input.InputSystem;
 import com.funnubunny.app.interaction.InteractionSystem;
 import com.funnubunny.app.quest.*;
+import com.funnubunny.app.render.*;
 import com.funnubunny.app.state.GameState;
 import com.funnubunny.app.state.GameStateSystem;
 import com.funnubunny.app.ui.DialogueBox;
@@ -69,6 +71,9 @@ public class GameEngine implements GLEventListener {
     private WorldSystem worldSystem;
     private NoteSystem noteSystem;
     private FogSystem fogSystem;
+    private RenderingSystem renderingSystem;
+
+    private WorldStateService worldStateService;
 
     private NoteManager noteManager;
     private List<Note> notes;
@@ -232,6 +237,15 @@ public class GameEngine implements GLEventListener {
         worldSystem = new WorldSystem(commandBus, islandScene, lighthouse);
 
         noteSystem = new NoteSystem(notes);
+
+        worldStateService = new WorldStateService(new WorldState(player, npc, lighthouse, islandScene, fogSystem, noteSystem));
+
+        renderingSystem = new RenderingSystem();
+
+        renderingSystem.register(new PlayerRenderer(worldStateService, spriteShader));
+        renderingSystem.register(new NpcRenderer(worldStateService, colorShader));
+        renderingSystem.register(new LighthouseRenderer(worldStateService, lighthouseShader));
+        renderingSystem.register(new NoteRenderer(worldStateService, spriteShader));
     }
 
     @Override
@@ -262,10 +276,7 @@ public class GameEngine implements GLEventListener {
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
         islandScene.render(gl, colorShader, camera);
-        player.render(gl, spriteShader, camera);
-        npc.render(gl, colorShader, camera);
-        lighthouse.render(gl, lighthouseShader, camera);
-        noteSystem.renger(gl, spriteShader, camera);
+        renderingSystem.render(new com.funnubunny.app.render.RenderContext(gl, camera));
         fogSystem.render(gl, camera);
         dialogueBox.render(gl);
         hud.render(gl);

@@ -36,10 +36,22 @@ public abstract class Entity {
         this.height = height;
     }
 
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
     public void setColor(float r, float g, float b) {
         this.r = r;
         this.g = g;
         this.b = b;
+    }
+
+    public float[] getColor() {
+        return new float[]{r, g, b};
     }
 
     public void setSprite(Sprite sprite) {
@@ -52,14 +64,5 @@ public abstract class Entity {
 
     public abstract void update();
 
-    public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {
-        shader.use(gl);
-        shader.setUniformMatrix4f(gl, "uProjectionView", camera.getProjectionView());
-        shader.setUniformVec2(gl, "uPosition", transform.getPosition().x, transform.getPosition().y);
-        shader.setUniformVec2(gl, "uScale", width, height);
-        shader.setUniformVec3(gl, "uColor", r, g, b);
-        shader.setUniformBool(gl, "uLighthouseOn", false);
-        mesh.render(gl);
-        shader.detach(gl);
-    }
+    public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {}
 }

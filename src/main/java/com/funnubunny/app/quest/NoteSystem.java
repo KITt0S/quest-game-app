@@ -21,11 +21,7 @@ public class NoteSystem {
         }
     }
 
-    public void renger(GL3 gl, ShaderProgram spriteShader, Camera2D camera) {
-        for (Note note : notes) {
-            if (!note.isCollected()) {
-                note.render(gl, spriteShader, camera);
-            }
-        }
+    public List<Note> getNotes() {
+        return notes;
     }
 }

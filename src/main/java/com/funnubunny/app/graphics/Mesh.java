@@ -98,6 +98,10 @@ public class Mesh {
         return new Mesh(vaoId, vboId, eboId, indexCount);
     }
 
+    public static Mesh getSpriteMesh(GL3 gl) {
+        return getSpriteMesh(gl, MeshData.SPRITE_VERTICES, MeshData.INDICES);
+    }
+
     public void useShader(ShaderProgram shader) {
         this.shader = shader;
     }

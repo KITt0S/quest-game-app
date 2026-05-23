@@ -21,10 +21,18 @@ public class Lighthouse extends Entity {
         this.active = active;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
     public void setSprites(Sprite inactive, Sprite active) {
         sprites = new Sprite[2];
         sprites[0] = inactive;
         sprites[1] = active;
+    }
+
+    public Sprite[] getSprites() {
+        return sprites;
     }
 
     @Override
@@ -34,26 +42,5 @@ public class Lighthouse extends Entity {
 
     public Vector2f getPosition() {
         return transform.getPosition();
-    }
-
-    @Override
-    public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {
-        shader.use(gl);
-        shader.setUniformMatrix4f(gl, "uProjectionView", camera.getProjectionView());
-        shader.setUniformVec2(gl, "uPosition", transform.getPosition().x, transform.getPosition().y);
-        shader.setUniformVec2(gl, "uScale", width, height);
-        shader.setUniformBool(gl, "active", active);
-        gl.glActiveTexture(GL3.GL_TEXTURE0);
-        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR);
-        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR);
-        sprites[0].getTexture().bind(gl);
-        shader.setUniformInt(gl, "textures[0]", 0);
-        gl.glActiveTexture(GL3.GL_TEXTURE1);
-        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR);
-        gl.glTexParameteri(GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR);
-        sprites[1].getTexture().bind(gl);
-        shader.setUniformInt(gl, "textures[1]", 1);
-        mesh.render(gl);
-        shader.detach(gl);
     }
 }

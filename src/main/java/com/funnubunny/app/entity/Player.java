@@ -4,7 +4,6 @@ import com.funnubunny.app.core.Input;
 import com.funnubunny.app.core.Time;
 import com.funnubunny.app.graphics.*;
 import com.jogamp.newt.event.KeyEvent;
-import com.jogamp.opengl.GL3;
 import org.joml.Vector2f;
 
 public class Player extends Entity {
@@ -41,12 +40,7 @@ public class Player extends Entity {
         return transform.getPosition();
     }
 
-    @Override
-    public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {
-        if (sprite == null || spriteRenderer == null) {
-            return;
-        }
-
-        spriteRenderer.render(gl, shader, camera, sprite, transform, width, height);
+    public Sprite getSprite() {
+        return sprite;
     }
 }
