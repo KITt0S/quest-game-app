@@ -1,8 +1,6 @@
 package com.funnubunny.app.graphics;
 
 import com.jogamp.opengl.GL3;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -100,6 +98,10 @@ public class Mesh {
 
     public static Mesh getSpriteMesh(GL3 gl) {
         return getSpriteMesh(gl, MeshData.SPRITE_VERTICES, MeshData.INDICES);
+    }
+
+    public static Mesh getColorMesh(GL3 gl) {
+        return getColorMesh(gl, MeshData.SHAPE_VERTICES, MeshData.INDICES);
     }
 
     public void useShader(ShaderProgram shader) {

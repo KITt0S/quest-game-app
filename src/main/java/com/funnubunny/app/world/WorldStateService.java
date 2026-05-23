@@ -27,4 +27,8 @@ public class WorldStateService {
     public NoteSystem getNoteSystem() {
         return worldState.getNoteSystem();
     }
+
+    public IslandScene getIslandScene() {
+        return worldState.getIslandScene();
+    }
 }

@@ -3,13 +3,12 @@ package com.funnubunny.app.world;
 import com.funnubunny.app.entity.Transform;
 import com.funnubunny.app.graphics.*;
 import com.jogamp.opengl.GL3;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @RequiredArgsConstructor
-public class WorldObject implements Renderable {
+public class WorldObject {
 
     @Getter
     private final Transform transform;
@@ -32,20 +31,8 @@ public class WorldObject implements Renderable {
     @Setter
     private Sprite sprite;
 
-    @Override
-    public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {
-        render(gl, shader, camera, false);
-    }
-
-    public void render(GL3 gl, ShaderProgram shader, Camera2D camera, boolean lighthouseOn) {
-        shader.use(gl);
-        shader.setUniformMatrix4f(gl, "uProjectionView", camera.getProjectionView());
-        shader.setUniformVec2(gl, "uPosition", transform.getPosition().x, transform.getPosition().y);
-        shader.setUniformVec2(gl, "uScale", width, height);
-        shader.setUniformVec3(gl, "uColor", r, g, b);
-        shader.setUniformBool(gl, "uLighthouseOn", lighthouseOn && affectedByLight);
-        mesh.render(gl);
-        shader.detach(gl);
+    public float[] getColor() {
+        return new float[] {r, g, b};
     }
 
     public static WorldObjectBuilder builder() {

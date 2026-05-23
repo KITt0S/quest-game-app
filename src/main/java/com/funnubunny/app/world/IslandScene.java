@@ -7,11 +7,9 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IslandScene implements Renderable {
-    private final List<WorldObject> worldObjects;
+public class IslandScene {
 
-    @Setter
-    private RenderContext context;
+    private final List<WorldObject> worldObjects;
 
     private boolean lighthouseOn = false;
 
@@ -94,21 +92,7 @@ public class IslandScene implements Renderable {
         worldObjects.get(4).setSprite(sprite);
     }
 
-    public void setLighthouseOn(boolean lighthouseOn) {
-        this.lighthouseOn = lighthouseOn;
-        context.setLighthouseOn(lighthouseOn);
-    }
-
-    @Override
-    public void render(GL3 gl, ShaderProgram shader, Camera2D camera) {
-        for (int i = 0; i < worldObjects.size(); i++) {
-            if (i != 3 && i != 4) {
-                WorldObject element = worldObjects.get(i);
-                element.render(gl, shader, camera, lighthouseOn);
-                continue;
-            }
-
-            new WorldObjectRenderer().render(gl, worldObjects.get(i), context);
-        }
+    public List<WorldObject> getWorldObjects() {
+        return worldObjects;
     }
 }

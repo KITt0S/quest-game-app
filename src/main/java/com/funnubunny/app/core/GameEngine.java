@@ -45,7 +45,6 @@ public class GameEngine implements GLEventListener {
     private Mesh colorQuad;
     private Mesh spriteQuad;
 
-    private RenderContext renderContext;
     private SpriteRenderer spriteRenderer;
 
     private Camera2D camera;
@@ -68,7 +67,7 @@ public class GameEngine implements GLEventListener {
     private CameraSystem cameraSystem;
     private InteractionSystem interactionSystem;
     private QuestSystem questSystem;
-    private WorldSystem worldSystem;
+    private WorldStateSystem worldSystem;
     private NoteSystem noteSystem;
     private FogSystem fogSystem;
     private RenderingSystem renderingSystem;
@@ -143,12 +142,6 @@ public class GameEngine implements GLEventListener {
 
         colorQuad = Mesh.getColorMesh(gl, shapeVertices, indices);
         spriteQuad = Mesh.getSpriteMesh(gl, spriteVertices, indices);
-
-        renderContext = new RenderContext();
-        renderContext.setCamera(camera);
-        renderContext.setMesh(spriteQuad);
-        renderContext.setShader(treesShader);
-
         spriteRenderer = new SpriteRenderer(spriteQuad);
 
         player = new Player();
@@ -163,7 +156,6 @@ public class GameEngine implements GLEventListener {
         npc.setMesh(colorQuad);
 
         islandScene = new IslandScene(colorQuad);
-        islandScene.setContext(renderContext);
 
         Texture treesTexture = new Texture("/textures/trees.png");
         Sprite treesSprite = new Sprite(treesTexture);
@@ -234,11 +226,11 @@ public class GameEngine implements GLEventListener {
         cameraSystem = new CameraSystem(camera, player);
         interactionSystem = new InteractionSystem(player, npc, dialogueBox, notes, noteManager, lighthouse, commandBus, eventBus);
         questSystem = new QuestSystem(commandBus, eventBus);
-        worldSystem = new WorldSystem(commandBus, islandScene, lighthouse);
-
         noteSystem = new NoteSystem(notes);
 
-        worldStateService = new WorldStateService(new WorldState(player, npc, lighthouse, islandScene, fogSystem, noteSystem));
+        WorldState worldState = new WorldState(player, npc, lighthouse, islandScene, fogSystem, noteSystem);
+        worldSystem = new WorldStateSystem(eventBus, worldState);
+        worldStateService = new WorldStateService(worldState);
 
         renderingSystem = new RenderingSystem();
 
@@ -246,6 +238,7 @@ public class GameEngine implements GLEventListener {
         renderingSystem.register(new NpcRenderer(worldStateService, colorShader));
         renderingSystem.register(new LighthouseRenderer(worldStateService, lighthouseShader));
         renderingSystem.register(new NoteRenderer(worldStateService, spriteShader));
+        renderingSystem.register(new IslandSceneRenderer(worldStateService, colorShader, treesShader));
     }
 
     @Override
@@ -262,7 +255,6 @@ public class GameEngine implements GLEventListener {
         inputSystem.update();
         interactionSystem.update();
         noteSystem.update();
-        worldSystem.update();
         cameraSystem.update();
         fogSystem.update(Time.getDeltaTime());
     }
@@ -275,7 +267,6 @@ public class GameEngine implements GLEventListener {
 
     private void render(GL3 gl) {
         gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
-        islandScene.render(gl, colorShader, camera);
         renderingSystem.render(new com.funnubunny.app.render.RenderContext(gl, camera));
         fogSystem.render(gl, camera);
         dialogueBox.render(gl);

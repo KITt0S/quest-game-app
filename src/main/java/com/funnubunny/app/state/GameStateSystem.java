@@ -1,6 +1,7 @@
 package com.funnubunny.app.state;
 
 import com.funnubunny.app.command.*;
+import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.quest.QuestState;
 
 public class GameStateSystem {
