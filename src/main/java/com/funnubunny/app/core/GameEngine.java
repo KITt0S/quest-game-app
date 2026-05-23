@@ -17,7 +17,6 @@ import com.funnubunny.app.render.RenderingSystem;
 import com.funnubunny.app.render.renderers.*;
 import com.funnubunny.app.state.GameState;
 import com.funnubunny.app.state.GameStateSystem;
-import com.funnubunny.app.ui.HUD;
 import com.funnubunny.app.world.*;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.opengl.GLWindow;
@@ -54,7 +53,6 @@ public class GameEngine implements GLEventListener {
     private GameState gameState;
 
     private DialogueBox dialogueBox;
-    private HUD hud;
 
     private CommandBus commandBus;
     private EventBus eventBus;
@@ -87,7 +85,6 @@ public class GameEngine implements GLEventListener {
         window = GLWindow.create(capabilities);
         window.setSize(WIDTH, HEIGHT);
         window.setTitle("The Last Lighthouse");
-        window.setFullscreen(true);
         window.setResizable(true);
         window.setVisible(true);
         window.addGLEventListener(this);
@@ -159,7 +156,6 @@ public class GameEngine implements GLEventListener {
         lighthouse.setSprites(inactiveSprite, activeSprite);
 
         dialogueBox = new DialogueBox();
-        hud = new HUD();
 
         Texture fogTexture = new Texture("/textures/fog.png");
         Sprite fogSprite = new Sprite(fogTexture);
@@ -239,7 +235,6 @@ public class GameEngine implements GLEventListener {
 
     private void render(GL3 gl) {
         renderingSystem.render(new com.funnubunny.app.render.RenderContext(gl, camera));
-        hud.render(gl);
     }
 
     private void stop() {
