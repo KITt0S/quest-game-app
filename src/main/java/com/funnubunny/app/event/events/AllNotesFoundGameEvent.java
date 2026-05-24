@@ -1,6 +1,4 @@
 package com.funnubunny.app.event.events;
 
-import com.funnubunny.app.event.GameEvent;
-
-public class AllNotesFoundGameEvent implements GameEvent {
+public class AllNotesFoundGameEvent implements InteractionEvent {
 }

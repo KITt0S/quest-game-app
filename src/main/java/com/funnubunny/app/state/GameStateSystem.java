@@ -6,7 +6,7 @@ import com.funnubunny.app.command.commands.changequeststate.ChangeQuestStateComm
 import com.funnubunny.app.command.commands.getqueststate.GetQuestStateAnswer;
 import com.funnubunny.app.command.commands.getqueststate.GetQuestStateCommand;
 import com.funnubunny.app.event.EventBus;
-import com.funnubunny.app.event.QuestStateChangedEvent;
+import com.funnubunny.app.event.events.QuestStateChangedEvent;
 import com.funnubunny.app.quest.QuestState;
 
 public class GameStateSystem {

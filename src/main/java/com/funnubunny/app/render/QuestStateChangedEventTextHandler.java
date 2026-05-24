@@ -1,7 +1,6 @@
 package com.funnubunny.app.render;
 
-import com.funnubunny.app.event.GameEvent;
-import com.funnubunny.app.event.QuestStateChangedEvent;
+import com.funnubunny.app.event.events.QuestStateChangedEvent;
 
 public class QuestStateChangedEventTextHandler implements EventTextHandler<QuestStateChangedEvent> {
 

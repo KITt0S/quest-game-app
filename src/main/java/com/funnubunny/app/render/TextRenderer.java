@@ -84,7 +84,8 @@ public class TextRenderer {
             GL3 gl,
             String text,
             float x,
-            float y) {
+            float y,
+            float percentageScale) {
 
         shader.use(gl);
         shader.setUniformMatrix4f(gl, "uProjection", new Matrix4f().ortho2D(0, 1280, 0, 720));
@@ -101,40 +102,39 @@ public class TextRenderer {
 
             if (c == '\n') {
 
-                y -= 40f;
+                y -= 40f * percentageScale / 100.0f;
 
                 cursorX = x;
 
                 continue;
             }
 
-            Glyph glyph =
-                    font.getGlyph(c);
+            Glyph glyph = font.getGlyph(c);
 
-            renderGlyph(
-                    gl,
-                    glyph,
-                    cursorX,
-                    y
-            );
+            renderGlyph(gl, glyph, cursorX, y, percentageScale);
 
-            cursorX += 20f;
+            cursorX += 20f * percentageScale / 100.0f;
         }
 
         gl.glBindVertexArray(0);
+    }
+
+    public void renderText(GL3 gl, String text, float x, float y) {
+        renderText(gl, text, x, y, 100.0f);
     }
 
     private void renderGlyph(
             GL3 gl,
             Glyph glyph,
             float x,
-            float y) {
+            float y,
+            float percentageScale) {
 
         float x0 = x;
         float y0 = y;
 
-        float x1 = x + GLYPH_SIZE;
-        float y1 = y + GLYPH_SIZE;
+        float x1 = x + GLYPH_SIZE * percentageScale / 100.0f;
+        float y1 = y + GLYPH_SIZE * percentageScale / 100.0f;
 
         float[] vertices = {
 

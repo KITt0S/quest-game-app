@@ -1,6 +1,6 @@
 package com.funnubunny.app.render;
 
-import com.funnubunny.app.event.GameEvent;
+import com.funnubunny.app.event.events.GameEvent;
 
 public interface EventTextHandler<T extends GameEvent> {
 

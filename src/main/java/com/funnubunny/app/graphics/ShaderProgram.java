@@ -136,4 +136,9 @@ public class ShaderProgram {
         int location = gl.glGetUniformLocation(programId, name);
         gl.glUniform1i(location, value);
     }
+
+    public void setUniformFloat(GL3 gl, String name, float value) {
+        int location = gl.glGetUniformLocation(programId, name);
+        gl.glUniform1f(location, value);
+    }
 }

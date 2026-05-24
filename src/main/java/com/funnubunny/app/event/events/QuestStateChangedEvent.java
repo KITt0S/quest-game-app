@@ -1,8 +1,8 @@
-package com.funnubunny.app.event;
+package com.funnubunny.app.event.events;
 
 import com.funnubunny.app.quest.QuestState;
 
-public class QuestStateChangedEvent implements GameEvent {
+public class QuestStateChangedEvent implements StateChangedEvent {
 
     private final QuestState questState;
 

@@ -1,5 +1,7 @@
 package com.funnubunny.app.event;
 
+import com.funnubunny.app.event.events.GameEvent;
+
 import java.util.*;
 
 public class EventBus {

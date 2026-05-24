@@ -1,8 +1,6 @@
 package com.funnubunny.app.event.events;
 
-import com.funnubunny.app.event.GameEvent;
-
-public class NoteCollectedEvent implements GameEvent {
+public class NoteCollectedEvent implements InteractionEvent {
     private final String noteText;
 
     public NoteCollectedEvent(String noteText) {

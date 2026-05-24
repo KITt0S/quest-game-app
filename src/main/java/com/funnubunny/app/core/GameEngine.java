@@ -18,8 +18,7 @@ import com.funnubunny.app.render.RenderContext;
 import com.funnubunny.app.render.RenderingSystem;
 import com.funnubunny.app.render.TextRenderer;
 import com.funnubunny.app.render.renderers.*;
-import com.funnubunny.app.state.GameState;
-import com.funnubunny.app.state.GameStateSystem;
+import com.funnubunny.app.state.*;
 import com.funnubunny.app.world.*;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.opengl.GLWindow;
@@ -172,13 +171,16 @@ public class GameEngine implements GLEventListener {
 
         gameState = new GameState();
         WorldState worldState = new WorldState(player, npc, notes, lighthouse, islandScene, fogSystem);
+        EventState eventState = new EventState();
 
         worldStateService = new WorldStateService(worldState);
+        EventStateService eventStateService = new EventStateService(eventState);
 
         commandBus = new CommandBus();
         eventBus = new EventBus();
 
         gameStateSystem = new GameStateSystem(gameState, commandBus, eventBus);
+        new EventStateSystem(eventState, eventBus);
         inputSystem = new InputSystem(commandBus);
         cameraSystem = new CameraSystem(camera, player);
         interactionSystem = new InteractionSystem(commandBus, eventBus, worldStateService);
@@ -198,7 +200,8 @@ public class GameEngine implements GLEventListener {
         renderingSystem.register(new IslandSceneRenderer(worldStateService, colorShader, treesShader));
         renderingSystem.register(new FogRenderer(worldStateService, fogShader));
         renderingSystem.register(new DialogueBoxRenderer(dialogueBox, textRenderer));
-        renderingSystem.register(new EventRenderer(textRenderer, eventBus));
+        renderingSystem.register(new InteractionEventRenderer(eventStateService, textRenderer));
+        renderingSystem.register(new StateChangedEventRenderer(eventStateService, textRenderer));
     }
 
     @Override
