@@ -1,20 +1,26 @@
 package com.funnubunny.app.world;
 
 import com.funnubunny.app.graphics.Sprite;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FogSystem {
-    private final List<FogLayer> layers;
+@Setter
+@Getter
+public class Fog {
+    private Status status;
+    private List<FogLayer> layers;
 
-    public FogSystem(Sprite fogSprite) {
+    public Fog(Sprite fogSprite) {
         layers = new ArrayList<>();
         createLayers(fogSprite);
+        init();
     }
 
-    public List<FogLayer> getLayers() {
-        return layers;
+    private void init() {
+        status = Status.HALF;
     }
 
     private void createLayers(Sprite fogSprite) {
@@ -53,5 +59,11 @@ public class FogSystem {
         for (FogLayer layer : layers) {
             layer.update(deltaTime);
         }
+    }
+
+    public enum Status {
+        FULL,
+        HALF,
+        ABSENT
     }
 }

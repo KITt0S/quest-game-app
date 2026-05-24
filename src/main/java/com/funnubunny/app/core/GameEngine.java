@@ -1,5 +1,6 @@
 package com.funnubunny.app.core;
 
+import com.funnubunny.app.audio.AudioManager;
 import com.funnubunny.app.command.CommandBus;
 import com.funnubunny.app.dialoguebox.DialogueBox;
 import com.funnubunny.app.dialoguebox.DialogueBoxSystem;
@@ -18,6 +19,8 @@ import com.funnubunny.app.render.RenderContext;
 import com.funnubunny.app.render.RenderingSystem;
 import com.funnubunny.app.graphics.text.TextRenderer;
 import com.funnubunny.app.render.renderers.*;
+import com.funnubunny.app.sound.AmbientSoundSystem;
+import com.funnubunny.app.sound.SoundEffectSystem;
 import com.funnubunny.app.state.*;
 import com.funnubunny.app.world.*;
 import com.jogamp.newt.event.KeyEvent;
@@ -67,9 +70,11 @@ public class GameEngine implements GLEventListener {
     private NoteSystem noteSystem;
     private QuestSystem questSystem;
     private WorldStateSystem worldSystem;
-    private FogSystem fogSystem;
+    private Fog fog;
     private DialogueBoxSystem dialogueBoxSystem;
     private RenderingSystem renderingSystem;
+
+    private AmbientSoundSystem ambientSoundSystem;
 
     private WorldStateService worldStateService;
 
@@ -143,7 +148,7 @@ public class GameEngine implements GLEventListener {
 
         Texture fogTexture = new Texture("/textures/fog.png");
         Sprite fogSprite = new Sprite(fogTexture);
-        fogSystem = new FogSystem(fogSprite);
+        fog = new Fog(fogSprite);
 
         List<Note> notes = new ArrayList<>();
 
@@ -166,15 +171,21 @@ public class GameEngine implements GLEventListener {
         notes.add(note2);
         notes.add(note3);
 
-        Texture fontTexture = new Texture("/textures/font.png");
-        BitmapFont bitmapFont = new BitmapFont(fontTexture);
+        AudioManager audioManager = new AudioManager();
+        audioManager.load("wind", "/audio/wind.wav");
+        audioManager.load("bell", "/audio/bell.wav");
+        audioManager.load("note", "/audio/note.wav");
+        audioManager.load("lightkeeper", "/audio/lightkeeper.wav");
 
         gameState = new GameState();
-        WorldState worldState = new WorldState(player, npc, notes, lighthouse, islandScene, fogSystem);
+        WorldState worldState = new WorldState(player, npc, notes, lighthouse, islandScene);
         EventState eventState = new EventState();
+        WeatherState weatherState = new WeatherState(fog);
 
+        GameStateService gameStateService = new GameStateService(gameState);
         worldStateService = new WorldStateService(worldState);
         EventStateService eventStateService = new EventStateService(eventState);
+        WeatherStateService weatherStateService = new WeatherStateService(weatherState);
 
         commandBus = new CommandBus();
         eventBus = new EventBus();
@@ -188,6 +199,13 @@ public class GameEngine implements GLEventListener {
         questSystem = new QuestSystem(commandBus, eventBus);
         dialogueBoxSystem = new DialogueBoxSystem(dialogueBox, commandBus);
         worldSystem = new WorldStateSystem(worldState, eventBus);
+        new WeatherStateSystem(weatherState, eventBus);
+
+        ambientSoundSystem = new AmbientSoundSystem(audioManager, weatherStateService, worldStateService);
+        new SoundEffectSystem(audioManager, eventBus);
+
+        Texture fontTexture = new Texture("/textures/font.png");
+        BitmapFont bitmapFont = new BitmapFont(fontTexture);
 
         TextRenderer textRenderer = new TextRenderer(gl, bitmapFont, textShader);
 
@@ -198,7 +216,7 @@ public class GameEngine implements GLEventListener {
         renderingSystem.register(new LighthouseRenderer(worldStateService, lighthouseShader));
         renderingSystem.register(new NoteRenderer(worldStateService, spriteShader));
         renderingSystem.register(new IslandSceneRenderer(worldStateService, colorShader, treesShader));
-        renderingSystem.register(new FogRenderer(worldStateService, fogShader));
+        renderingSystem.register(new FogRenderer(weatherStateService, fogShader));
         renderingSystem.register(new DialogueBoxRenderer(dialogueBox, textRenderer));
         renderingSystem.register(new InteractionEventRenderer(eventStateService, textRenderer));
         renderingSystem.register(new StateChangedEventRenderer(eventStateService, textRenderer));
@@ -218,7 +236,8 @@ public class GameEngine implements GLEventListener {
         inputSystem.update();
         interactionSystem.update();
         cameraSystem.update();
-        fogSystem.update(Time.getDeltaTime());
+        fog.update(Time.getDeltaTime());
+        ambientSoundSystem.update();
     }
 
     private void handleGlobalInput() {

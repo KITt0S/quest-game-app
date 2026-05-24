@@ -4,7 +4,7 @@ import com.funnubunny.app.graphics.Mesh;
 import com.funnubunny.app.graphics.ShaderProgram;
 import com.funnubunny.app.note.Note;
 import com.funnubunny.app.render.RenderContext;
-import com.funnubunny.app.world.WorldStateService;
+import com.funnubunny.app.state.WorldStateService;
 import com.jogamp.opengl.GL3;
 
 import java.util.List;

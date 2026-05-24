@@ -1,13 +1,18 @@
-package com.funnubunny.app.world;
+package com.funnubunny.app.state;
 
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.note.Note;
+import com.funnubunny.app.world.Fog;
+import com.funnubunny.app.world.IslandScene;
+import com.funnubunny.app.world.Lighthouse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
 @Getter
 @RequiredArgsConstructor
 public class WorldState {
@@ -16,5 +21,5 @@ public class WorldState {
     private final List<Note> notes;
     private final Lighthouse lighthouse;
     private final IslandScene islandScene;
-    private final FogSystem fogSystem;
+    private boolean bellRinging = true;
 }

@@ -18,7 +18,7 @@ public class GameState {
         return state.getOrDefault(key, defaultValue);
     }
 
-    enum GameStateKey {
+    public enum GameStateKey {
         QUEST_STATE
     }
 }

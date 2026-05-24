@@ -5,7 +5,7 @@ import com.funnubunny.app.graphics.ShaderProgram;
 import com.funnubunny.app.render.RenderContext;
 import com.funnubunny.app.world.IslandScene;
 import com.funnubunny.app.world.WorldObject;
-import com.funnubunny.app.world.WorldStateService;
+import com.funnubunny.app.state.WorldStateService;
 import com.jogamp.opengl.GL3;
 
 import java.util.List;

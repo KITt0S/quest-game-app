@@ -20,7 +20,7 @@ import com.funnubunny.app.event.events.*;
 import com.funnubunny.app.note.Note;
 import com.funnubunny.app.quest.QuestState;
 import com.funnubunny.app.world.Lighthouse;
-import com.funnubunny.app.world.WorldStateService;
+import com.funnubunny.app.state.WorldStateService;
 
 public class InteractionSystem {
     private final CommandBus commandBus;

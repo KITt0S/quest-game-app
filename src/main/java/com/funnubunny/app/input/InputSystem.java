@@ -49,7 +49,7 @@ public class InputSystem {
     }
 
     public void pressedF() {
-        if (Input.isKeyPressed(KeyEvent.VK_R)) {
+        if (Input.isKeyPressed(KeyEvent.VK_F)) {
             commandBus.dispatch(new DestroyLighthouseCommand());
         }
     }

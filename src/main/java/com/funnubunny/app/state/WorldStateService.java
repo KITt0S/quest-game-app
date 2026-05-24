@@ -1,8 +1,11 @@
-package com.funnubunny.app.world;
+package com.funnubunny.app.state;
 
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.note.Note;
+import com.funnubunny.app.world.Fog;
+import com.funnubunny.app.world.IslandScene;
+import com.funnubunny.app.world.Lighthouse;
 
 import java.util.List;
 
@@ -34,11 +37,11 @@ public class WorldStateService {
         return worldState.getIslandScene();
     }
 
-    public FogSystem getFogSystem() {
-        return worldState.getFogSystem();
-    }
-
     public Note getNoteById(String id) {
         return worldState.getNotes().stream().filter(note -> note.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    public boolean isBellRinging() {
+        return worldState.isBellRinging();
     }
 }
