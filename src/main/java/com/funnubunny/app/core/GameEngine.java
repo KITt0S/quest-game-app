@@ -16,7 +16,7 @@ import com.funnubunny.app.quest.Dialogue;
 import com.funnubunny.app.quest.QuestSystem;
 import com.funnubunny.app.render.RenderContext;
 import com.funnubunny.app.render.RenderingSystem;
-import com.funnubunny.app.render.TextRenderer;
+import com.funnubunny.app.graphics.text.TextRenderer;
 import com.funnubunny.app.render.renderers.*;
 import com.funnubunny.app.state.*;
 import com.funnubunny.app.world.*;

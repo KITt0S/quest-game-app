@@ -1,4 +1,4 @@
-package com.funnubunny.app.render;
+package com.funnubunny.app.graphics.text;
 
 import com.funnubunny.app.graphics.ShaderProgram;
 import com.funnubunny.app.graphics.text.BitmapFont;

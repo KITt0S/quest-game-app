@@ -1,7 +1,7 @@
 package com.funnubunny.app.render.renderers;
 
 import com.funnubunny.app.event.events.StateChangedEvent;
-import com.funnubunny.app.render.TextRenderer;
+import com.funnubunny.app.graphics.text.TextRenderer;
 import com.funnubunny.app.state.EventStateService;
 
 public class StateChangedEventRenderer extends EventRenderer<StateChangedEvent> {

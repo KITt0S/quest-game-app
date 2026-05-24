@@ -1,9 +1,9 @@
 package com.funnubunny.app.render.renderers;
 
 import com.funnubunny.app.event.events.GameEvent;
-import com.funnubunny.app.render.EventTextHandlerFactory;
+import com.funnubunny.app.render.texthandlers.EventTextHandlerFactory;
 import com.funnubunny.app.render.RenderContext;
-import com.funnubunny.app.render.TextRenderer;
+import com.funnubunny.app.graphics.text.TextRenderer;
 import com.funnubunny.app.state.EventStateService;
 
 public abstract class EventRenderer<T extends GameEvent> implements Renderable {

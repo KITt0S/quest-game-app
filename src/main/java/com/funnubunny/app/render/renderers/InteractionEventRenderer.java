@@ -1,8 +1,7 @@
 package com.funnubunny.app.render.renderers;
 
-import com.funnubunny.app.event.events.GameEvent;
 import com.funnubunny.app.event.events.InteractionEvent;
-import com.funnubunny.app.render.TextRenderer;
+import com.funnubunny.app.graphics.text.TextRenderer;
 import com.funnubunny.app.state.EventStateService;
 
 public class InteractionEventRenderer extends EventRenderer<InteractionEvent> {

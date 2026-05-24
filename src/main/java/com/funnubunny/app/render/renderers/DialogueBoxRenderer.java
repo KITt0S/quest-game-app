@@ -2,7 +2,7 @@ package com.funnubunny.app.render.renderers;
 
 import com.funnubunny.app.dialoguebox.DialogueBox;
 import com.funnubunny.app.render.RenderContext;
-import com.funnubunny.app.render.TextRenderer;
+import com.funnubunny.app.graphics.text.TextRenderer;
 
 public class DialogueBoxRenderer implements Renderable {
     private final DialogueBox dialogueBox;
