@@ -130,6 +130,8 @@ public class GameEngine implements GLEventListener {
                         "The lighthouse went dark...",
                         "Something is wrong in the fog.",
                         "Find the power source.")));
+        npc.setSprite(new Sprite(new Texture("/textures/old_keeper.png")));
+        npc.setSize(50.0f, 50.0f);
 
         islandScene = new IslandScene();
 
@@ -212,7 +214,7 @@ public class GameEngine implements GLEventListener {
         renderingSystem = new RenderingSystem();
 
         renderingSystem.register(new PlayerRenderer(worldStateService, spriteShader));
-        renderingSystem.register(new NpcRenderer(worldStateService, colorShader));
+        renderingSystem.register(new NpcRenderer(worldStateService, spriteShader));
         renderingSystem.register(new LighthouseRenderer(worldStateService, lighthouseShader));
         renderingSystem.register(new NoteRenderer(worldStateService, spriteShader));
         renderingSystem.register(new IslandSceneRenderer(worldStateService, colorShader, treesShader));

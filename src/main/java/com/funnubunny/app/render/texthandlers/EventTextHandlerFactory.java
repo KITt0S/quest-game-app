@@ -1,10 +1,6 @@
 package com.funnubunny.app.render.texthandlers;
 
-import com.funnubunny.app.event.events.GameEvent;
-import com.funnubunny.app.event.events.QuestStateChangedEvent;
-import com.funnubunny.app.event.events.NoteCollectedEvent;
-import com.funnubunny.app.event.events.ReachedLighthouseEvent;
-import com.funnubunny.app.event.events.RelightedLighthouseEvent;
+import com.funnubunny.app.event.events.*;
 
 import java.util.Map;
 
@@ -13,6 +9,7 @@ public class EventTextHandlerFactory {
             Map.entry(NoteCollectedEvent.class, new NoteCollectedEventTextHandler()),
             Map.entry(ReachedLighthouseEvent.class, new ReachedLighthouseEventTextHandler()),
             Map.entry(RelightedLighthouseEvent.class, new RelightedLighthouseEventTextHandler()),
+            Map.entry(DestroyedLighthouseEvent.class, new DestroyedLighthouseEventTextHandler()),
             Map.entry(QuestStateChangedEvent.class, new QuestStateChangedEventTextHandler()));
 
     @SuppressWarnings("unchecked")

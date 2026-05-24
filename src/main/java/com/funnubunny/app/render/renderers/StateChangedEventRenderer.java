@@ -9,14 +9,4 @@ public class StateChangedEventRenderer extends EventRenderer<StateChangedEvent> 
     public StateChangedEventRenderer(EventStateService eventStateService, TextRenderer textRenderer) {
         super(StateChangedEvent.class, eventStateService, textRenderer);
     }
-
-    @Override
-    public float[] position() {
-        return new float[]{1000, 680};
-    }
-
-    @Override
-    protected float textScale() {
-        return 75f;
-    }
 }

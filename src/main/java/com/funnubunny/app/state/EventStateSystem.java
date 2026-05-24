@@ -3,6 +3,7 @@ package com.funnubunny.app.state;
 import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.event.events.GameEvent;
 import com.funnubunny.app.event.events.InteractionEvent;
+import com.funnubunny.app.event.events.QuestStateChangedEvent;
 import com.funnubunny.app.event.events.StateChangedEvent;
 
 public class EventStateSystem {

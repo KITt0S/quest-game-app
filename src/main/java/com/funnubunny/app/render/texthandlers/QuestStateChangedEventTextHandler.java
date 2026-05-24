@@ -8,4 +8,14 @@ public class QuestStateChangedEventTextHandler implements EventTextHandler<Quest
     public String getText(QuestStateChangedEvent event) {
         return event.getQuestState().name();
     }
+
+    @Override
+    public float[] position() {
+        return new float[] {1000, 680};
+    }
+
+    @Override
+    public float scale() {
+        return 75.0f;
+    }
 }

@@ -9,9 +9,4 @@ public class InteractionEventRenderer extends EventRenderer<InteractionEvent> {
     public InteractionEventRenderer(EventStateService eventStateService, TextRenderer textRenderer) {
         super(InteractionEvent.class, eventStateService, textRenderer);
     }
-
-    @Override
-    public float[] position() {
-        return new float[] {300, 360};
-    }
 }
