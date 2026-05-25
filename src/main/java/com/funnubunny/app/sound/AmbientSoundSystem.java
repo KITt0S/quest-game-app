@@ -24,12 +24,15 @@ public class AmbientSoundSystem {
     }
 
     public void init() {
-        audioManager.loop("wind");
-        audioManager.loop("bell");
         audioManager.setVolume("wind", 1.0f);
         audioManager.setVolume("bell", 1.0f);
+
+        audioManager.loop("wind");
+        audioManager.loop("bell");
+
         windVolume = 1.0f;
         bellVolume = 1.0f;
+
         windOn = true;
         bellOn = true;
     }
@@ -48,11 +51,11 @@ public class AmbientSoundSystem {
             return;
         }
 
-        windVolume -= Time.getDeltaTime() * 0.005f;
+        windVolume -= Time.getDeltaTime() * 0.35f;
         audioManager.setVolume("wind", windVolume);
 
         if (windVolume <= 0.01f && windOn) {
-            audioManager.setVolume("wind", 0.0f);
+            audioManager.stop("bell");
             windOn = false;
         }
     }
@@ -66,11 +69,11 @@ public class AmbientSoundSystem {
             return;
         }
 
-        bellVolume -= Time.getDeltaTime() * 0.005f;
+        bellVolume -= Time.getDeltaTime() * 0.35f;
         audioManager.setVolume("bell", bellVolume);
 
         if (bellVolume <= 0.01f && bellOn) {
-            audioManager.setVolume("bell", 0.0f);
+            audioManager.stop("bell");
             bellOn = false;
         }
     }

@@ -20,6 +20,10 @@ public class AudioPlayer {
 
         Clip clip = audioClip.getClip();
 
+        clip.stop();
+
+        clip.setFramePosition(0);
+
         clip.loop(Clip.LOOP_CONTINUOUSLY);
 
         clip.start();
@@ -27,7 +31,11 @@ public class AudioPlayer {
 
     public void stop(AudioClip audioClip) {
 
-        audioClip.getClip().stop();
+        Clip clip = audioClip.getClip();
+
+        clip.stop();
+
+        clip.setFramePosition(0);
     }
 
     public void setVolume(AudioClip audioClip, float volume) {
@@ -36,10 +44,21 @@ public class AudioPlayer {
 
         FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
 
-        float min = gainControl.getMinimum();
-        float max = gainControl.getValue();
+        volume = Math.max(0.0f, Math.min(1.0f, volume));
 
-        float gain = min + (max - min) * volume;
+        float min = gainControl.getMinimum();
+
+        float gain;
+
+        if (volume == 0f) {
+
+            gain = min;
+
+        } else {
+
+            gain = (float) (20f * Math.log10(volume));
+        }
+
         gainControl.setValue(gain);
     }
 }
