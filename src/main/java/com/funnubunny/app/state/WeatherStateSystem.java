@@ -1,26 +1,53 @@
 package com.funnubunny.app.state;
 
+import com.funnubunny.app.core.Time;
 import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.event.events.DestroyedLighthouseEvent;
-import com.funnubunny.app.event.events.GameEvent;
 import com.funnubunny.app.event.events.RelightedLighthouseEvent;
-import com.funnubunny.app.world.Fog;
 
 public class WeatherStateSystem {
-    private WeatherState weatherState;
+    private WeatherStateService weatherStateService;
 
-    public WeatherStateSystem(WeatherState weatherState, EventBus eventBus) {
-        this.weatherState = weatherState;
+    public WeatherStateSystem(WeatherStateService weatherStateService, EventBus eventBus) {
+        this.weatherStateService = weatherStateService;
         eventBus.register(RelightedLighthouseEvent.class, this::onRelightedLighthouse);
         eventBus.register(DestroyedLighthouseEvent.class, this::onDestroyedLighthouse);
     }
 
     private void onRelightedLighthouse(RelightedLighthouseEvent event) {
-        weatherState.getFog().setStatus(Fog.Status.FULL);
+        weatherStateService.setFogStatus(FogState.Status.FULL);
     }
 
     private void onDestroyedLighthouse(DestroyedLighthouseEvent event) {
-        weatherState.getFog().setStatus(Fog.Status.ABSENT);
-        weatherState.setWind(false);
+        weatherStateService.setFogStatus(FogState.Status.ABSENT);
+        weatherStateService.setWind(false);
+    }
+
+    public void update() {
+        updateFog();
+    }
+
+    private void updateFog() {
+        weatherStateService.getFogState().update(Time.getDeltaTime());
+        updateDensity();
+    }
+
+    private void updateDensity() {
+        float density = weatherStateService.getFogDensity();
+
+        FogState.Status status = weatherStateService.getFogStatus();
+
+        if (status == FogState.Status.HALF && density == 0.5f) {
+        }
+
+        if (status == FogState.Status.FULL && density < 1.0f) {
+            density += Time.getDeltaTime() * 0.05f;
+        }
+
+        if (status == FogState.Status.ABSENT && density > 0.0f) {
+            density -= Time.getDeltaTime() * 0.05f;
+        }
+
+        weatherStateService.setFogDensity(density);
     }
 }

@@ -26,6 +26,8 @@ public class AmbientSoundSystem {
     public void init() {
         audioManager.loop("wind");
         audioManager.loop("bell");
+        audioManager.setVolume("wind", 1.0f);
+        audioManager.setVolume("bell", 1.0f);
         windVolume = 1.0f;
         bellVolume = 1.0f;
         windOn = true;
@@ -50,7 +52,7 @@ public class AmbientSoundSystem {
         audioManager.setVolume("wind", windVolume);
 
         if (windVolume <= 0.01f && windOn) {
-            audioManager.stop("wind");
+            audioManager.setVolume("wind", 0.0f);
             windOn = false;
         }
     }
@@ -68,7 +70,7 @@ public class AmbientSoundSystem {
         audioManager.setVolume("bell", bellVolume);
 
         if (bellVolume <= 0.01f && bellOn) {
-            audioManager.stop("bell");
+            audioManager.setVolume("bell", 0.0f);
             bellOn = false;
         }
     }

@@ -6,7 +6,7 @@ import java.util.Map;
 public class GameState {
     private final Map<GameStateKey, String> state = new HashMap<>();
 
-    public void set(GameStateKey key, String value) {
+    public void put(GameStateKey key, String value) {
         state.put(key, value);
     }
 
@@ -19,6 +19,7 @@ public class GameState {
     }
 
     public enum GameStateKey {
-        QUEST_STATE
+        QUEST_STATE,
+        ENGINE_STATE
     }
 }

@@ -6,9 +6,12 @@ import com.funnubunny.app.render.texthandlers.EventTextHandler;
 import com.funnubunny.app.render.texthandlers.EventTextHandlerFactory;
 import com.funnubunny.app.render.RenderContext;
 import com.funnubunny.app.graphics.text.TextRenderer;
+import com.funnubunny.app.state.EngineState;
 import com.funnubunny.app.state.EventStateService;
+import com.funnubunny.app.state.GameStateService;
 
 public abstract class EventRenderer<T extends GameEvent> implements Renderable {
+    private final GameStateService gameStateService;
     private final EventStateService eventStateService;
     private final TextRenderer textRenderer;
     private final Class<T> type;
@@ -17,14 +20,19 @@ public abstract class EventRenderer<T extends GameEvent> implements Renderable {
 
     private T event;
 
-    public EventRenderer(Class<T> type, EventStateService eventStateService, TextRenderer textRenderer) {
+    public EventRenderer(Class<T> type, GameStateService gameStateService, EventStateService eventStateService, TextRenderer textRenderer) {
         this.type = type;
+        this.gameStateService = gameStateService;
         this.eventStateService = eventStateService;
         this.textRenderer = textRenderer;
     }
 
     @Override
     public void render(RenderContext context) {
+        if (gameStateService.getEngineState() != EngineState.PLAYING) {
+            return;
+        }
+
         if (event == null) {
             event = pop();
         }

@@ -3,6 +3,8 @@ package com.funnubunny.app.render.renderers;
 import com.funnubunny.app.graphics.Mesh;
 import com.funnubunny.app.graphics.ShaderProgram;
 import com.funnubunny.app.render.RenderContext;
+import com.funnubunny.app.state.EngineState;
+import com.funnubunny.app.state.GameStateService;
 import com.funnubunny.app.world.Lighthouse;
 import com.funnubunny.app.state.WorldStateService;
 import com.jogamp.opengl.GL3;
@@ -10,13 +12,17 @@ import com.jogamp.opengl.GL3;
 public class LighthouseRenderer extends Renderer {
     private final ShaderProgram shader;
 
-    public LighthouseRenderer(WorldStateService worldStateService, ShaderProgram shader) {
-        super(worldStateService);
+    public LighthouseRenderer(GameStateService gameStateService, WorldStateService worldStateService, ShaderProgram shader) {
+        super(gameStateService, worldStateService);
         this.shader = shader;
     }
 
     @Override
     public void render(RenderContext context) {
+        if (gameStateService.getEngineState() != EngineState.PLAYING) {
+            return;
+        }
+
         GL3 gl = context.getGl();
         shader.use(gl);
         shader.setUniformMatrix4f(gl, "uProjectionView", context.getCamera().getProjectionView());

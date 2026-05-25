@@ -1,12 +1,14 @@
 package com.funnubunny.app.input;
 
 import com.funnubunny.app.command.*;
+import com.funnubunny.app.command.commands.changeenginestate.ChangeEngineStateCommand;
 import com.funnubunny.app.command.commands.destroylighthouse.DestroyLighthouseCommand;
 import com.funnubunny.app.command.commands.interaction.InteractionCommand;
 import com.funnubunny.app.command.commands.nextdialogue.NextDialogueCommand;
 import com.funnubunny.app.command.commands.relightlighthouse.RelightLighthouseCommand;
 import com.funnubunny.app.core.Input;
 import com.funnubunny.app.core.Time;
+import com.funnubunny.app.state.EngineState;
 import com.jogamp.newt.event.KeyEvent;
 
 public class InputSystem {
@@ -26,6 +28,7 @@ public class InputSystem {
         pressedR();
         pressedF();
         pressedSpace();
+        pressedEnter();
     }
 
     public void pressedW() {}
@@ -58,6 +61,12 @@ public class InputSystem {
         if (Input.isKeyPressed(KeyEvent.VK_SPACE)) {
             commandBus.dispatch(new NextDialogueCommand());
             Input.releaseKey(KeyEvent.VK_SPACE);
+        }
+    }
+
+    public void pressedEnter() {
+        if (Input.isKeyPressed(KeyEvent.VK_ENTER)) {
+            commandBus.dispatch(new ChangeEngineStateCommand());
         }
     }
 }

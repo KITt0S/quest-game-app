@@ -3,6 +3,8 @@ package com.funnubunny.app.render.renderers;
 import com.funnubunny.app.graphics.Mesh;
 import com.funnubunny.app.graphics.ShaderProgram;
 import com.funnubunny.app.render.RenderContext;
+import com.funnubunny.app.state.EngineState;
+import com.funnubunny.app.state.GameStateService;
 import com.funnubunny.app.world.IslandScene;
 import com.funnubunny.app.world.WorldObject;
 import com.funnubunny.app.state.WorldStateService;
@@ -14,14 +16,18 @@ public class IslandSceneRenderer extends Renderer {
     private final ShaderProgram shader;
     private final ShaderProgram treesShader;
 
-    public IslandSceneRenderer(WorldStateService worldStateService, ShaderProgram shader, ShaderProgram treesShader) {
-        super(worldStateService);
+    public IslandSceneRenderer(GameStateService gameStateService, WorldStateService worldStateService, ShaderProgram shader, ShaderProgram treesShader) {
+        super(gameStateService, worldStateService);
         this.shader = shader;
         this.treesShader = treesShader;
     }
 
     @Override
     public void render(RenderContext context) {
+        if (gameStateService.getEngineState() != EngineState.PLAYING) {
+            return;
+        }
+
         GL3 gl = context.getGl();
         IslandScene islandScene = worldStateService.getIslandScene();
 

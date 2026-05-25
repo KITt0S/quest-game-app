@@ -64,13 +64,14 @@ public class GameEngine implements GLEventListener {
     private EventBus eventBus;
 
     private GameStateSystem gameStateSystem;
+    private EndingSequenceSystem endingSequenceSystem;
     private InputSystem inputSystem;
     private CameraSystem cameraSystem;
     private InteractionSystem interactionSystem;
     private NoteSystem noteSystem;
     private QuestSystem questSystem;
     private WorldStateSystem worldSystem;
-    private Fog fog;
+    private WeatherStateSystem weatherStateSystem;
     private DialogueBoxSystem dialogueBoxSystem;
     private RenderingSystem renderingSystem;
 
@@ -150,7 +151,6 @@ public class GameEngine implements GLEventListener {
 
         Texture fogTexture = new Texture("/textures/fog.png");
         Sprite fogSprite = new Sprite(fogTexture);
-        fog = new Fog(fogSprite);
 
         List<Note> notes = new ArrayList<>();
 
@@ -182,7 +182,7 @@ public class GameEngine implements GLEventListener {
         gameState = new GameState();
         WorldState worldState = new WorldState(player, npc, notes, lighthouse, islandScene);
         EventState eventState = new EventState();
-        WeatherState weatherState = new WeatherState(fog);
+        WeatherState weatherState = new WeatherState(new FogState(fogSprite), true);
 
         GameStateService gameStateService = new GameStateService(gameState);
         worldStateService = new WorldStateService(worldState);
@@ -192,7 +192,8 @@ public class GameEngine implements GLEventListener {
         commandBus = new CommandBus();
         eventBus = new EventBus();
 
-        gameStateSystem = new GameStateSystem(gameState, commandBus, eventBus);
+        gameStateSystem = new GameStateSystem(gameStateService, commandBus, eventBus);
+        endingSequenceSystem = new EndingSequenceSystem(gameStateService);
         new EventStateSystem(eventState, eventBus);
         inputSystem = new InputSystem(commandBus);
         cameraSystem = new CameraSystem(camera, player);
@@ -201,10 +202,13 @@ public class GameEngine implements GLEventListener {
         questSystem = new QuestSystem(commandBus, eventBus);
         dialogueBoxSystem = new DialogueBoxSystem(dialogueBox, commandBus);
         worldSystem = new WorldStateSystem(worldState, eventBus);
-        new WeatherStateSystem(weatherState, eventBus);
+        weatherStateSystem = new WeatherStateSystem(weatherStateService, eventBus);
+
 
         ambientSoundSystem = new AmbientSoundSystem(audioManager, weatherStateService, worldStateService);
         new SoundEffectSystem(audioManager, eventBus);
+
+        new GameResetSystem(gameStateService, worldStateService, weatherStateService, commandBus, ambientSoundSystem);
 
         Texture fontTexture = new Texture("/textures/font.png");
         BitmapFont bitmapFont = new BitmapFont(fontTexture);
@@ -213,15 +217,17 @@ public class GameEngine implements GLEventListener {
 
         renderingSystem = new RenderingSystem();
 
-        renderingSystem.register(new PlayerRenderer(worldStateService, spriteShader));
-        renderingSystem.register(new NpcRenderer(worldStateService, spriteShader));
-        renderingSystem.register(new LighthouseRenderer(worldStateService, lighthouseShader));
-        renderingSystem.register(new NoteRenderer(worldStateService, spriteShader));
-        renderingSystem.register(new IslandSceneRenderer(worldStateService, colorShader, treesShader));
-        renderingSystem.register(new FogRenderer(weatherStateService, fogShader));
-        renderingSystem.register(new DialogueBoxRenderer(dialogueBox, textRenderer));
-        renderingSystem.register(new InteractionEventRenderer(eventStateService, textRenderer));
-        renderingSystem.register(new StateChangedEventRenderer(eventStateService, textRenderer));
+        renderingSystem.register(new StartScreenRenderer(gameStateService, textRenderer));
+        renderingSystem.register(new EndingScreenRenderer(gameStateService, textRenderer));
+        renderingSystem.register(new PlayerRenderer(gameStateService, worldStateService, spriteShader));
+        renderingSystem.register(new NpcRenderer(gameStateService, worldStateService, spriteShader));
+        renderingSystem.register(new LighthouseRenderer(gameStateService, worldStateService, lighthouseShader));
+        renderingSystem.register(new NoteRenderer(gameStateService, worldStateService, spriteShader));
+        renderingSystem.register(new IslandSceneRenderer(gameStateService, worldStateService, colorShader, treesShader));
+        renderingSystem.register(new FogRenderer(gameStateService, weatherStateService, fogShader));
+        renderingSystem.register(new DialogueBoxRenderer(gameStateService, dialogueBox, textRenderer));
+        renderingSystem.register(new InteractionEventRenderer(gameStateService, eventStateService, textRenderer));
+        renderingSystem.register(new StateChangedEventRenderer(gameStateService, eventStateService, textRenderer));
     }
 
     @Override
@@ -238,8 +244,9 @@ public class GameEngine implements GLEventListener {
         inputSystem.update();
         interactionSystem.update();
         cameraSystem.update();
-        fog.update(Time.getDeltaTime());
+        weatherStateSystem.update();
         ambientSoundSystem.update();
+        endingSequenceSystem.update();
     }
 
     private void handleGlobalInput() {

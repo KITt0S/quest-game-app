@@ -44,4 +44,8 @@ public class WorldStateService {
     public boolean isBellRinging() {
         return worldState.isBellRinging();
     }
+
+    public void setBellRinging(boolean bellRinging) {
+        worldState.setBellRinging(bellRinging);
+    }
 }

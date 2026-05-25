@@ -2,6 +2,7 @@ package com.funnubunny.app.state;
 
 import com.funnubunny.app.command.*;
 import com.funnubunny.app.command.commands.*;
+import com.funnubunny.app.command.commands.changeenginestate.ChangeEngineStateCommand;
 import com.funnubunny.app.command.commands.changequeststate.ChangeQuestStateCommand;
 import com.funnubunny.app.command.commands.getqueststate.GetQuestStateAnswer;
 import com.funnubunny.app.command.commands.getqueststate.GetQuestStateCommand;
@@ -9,24 +10,45 @@ import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.event.events.QuestStateChangedEvent;
 import com.funnubunny.app.quest.QuestState;
 
+import java.util.List;
+
 public class GameStateSystem {
-    private final GameState gameState;
+    private final GameStateService gameStateService;
+    private final CommandBus commandBus;
     private final EventBus eventBus;
 
-    public GameStateSystem(GameState gameState, CommandBus commandBus, EventBus eventBus) {
-        this.gameState = gameState;
+    public GameStateSystem(GameStateService gameStateService, CommandBus commandBus, EventBus eventBus) {
+        this.gameStateService = gameStateService;
         this.eventBus = eventBus;
+        this.commandBus = commandBus;
+        commandBus.register(ChangeEngineStateCommand.class, this::changeEngineState);
         commandBus.register(ChangeQuestStateCommand.class, this::changeQuestState);
         commandBus.register(GetQuestStateCommand.class, this::getQuestState);
     }
 
+    public GameAnswer changeEngineState(ChangeEngineStateCommand command) {
+        if (gameStateService.getEngineState() == EngineState.STARTING) {
+            gameStateService.setEngineState(EngineState.PLAYING);
+            return new VoidAnswer();
+        }
+
+        if (gameStateService.getEngineState() == EngineState.ENDING) {
+            commandBus.dispatch(new ResetGameCommand());
+            return new VoidAnswer();
+        }
+
+        return new VoidAnswer();
+    }
+
     public GameAnswer changeQuestState(ChangeQuestStateCommand command) {
-        gameState.set(GameState.GameStateKey.QUEST_STATE, command.getQuestState().name());
+        gameStateService.setQuestState(command.getQuestState());
+
         eventBus.emit(new QuestStateChangedEvent(command.getQuestState()));
+
         return new VoidAnswer();
     }
 
     public GameAnswer getQuestState(GetQuestStateCommand command) {
-        return new GetQuestStateAnswer(QuestState.valueOf(gameState.getOrDefault(GameState.GameStateKey.QUEST_STATE, QuestState.NOT_STARTED.name())));
+        return new GetQuestStateAnswer(gameStateService.getQuestState());
     }
 }

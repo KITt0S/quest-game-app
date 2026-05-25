@@ -33,6 +33,10 @@ public class Note extends Entity {
         collected = true;
     }
 
+    public void setCollected(boolean collected) {
+        this.collected = collected;
+    }
+
     public String getText() {
         return text;
     }
