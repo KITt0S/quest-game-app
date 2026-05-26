@@ -10,6 +10,8 @@ import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.graphics.*;
 import com.funnubunny.app.graphics.text.BitmapFont;
 import com.funnubunny.app.input.InputSystem;
+import com.funnubunny.app.world.WorldExplorationService;
+import com.funnubunny.app.interaction.InteractionPolicyService;
 import com.funnubunny.app.interaction.InteractionSystem;
 import com.funnubunny.app.note.Note;
 import com.funnubunny.app.note.NoteSystem;
@@ -63,21 +65,14 @@ public class GameEngine implements GLEventListener {
     private CommandBus commandBus;
     private EventBus eventBus;
 
-    private GameStateSystem gameStateSystem;
     private EndingSequenceSystem endingSequenceSystem;
     private InputSystem inputSystem;
     private CameraSystem cameraSystem;
-    private InteractionSystem interactionSystem;
-    private NoteSystem noteSystem;
-    private QuestSystem questSystem;
-    private WorldStateSystem worldSystem;
     private WeatherStateSystem weatherStateSystem;
-    private DialogueBoxSystem dialogueBoxSystem;
+    private WorldExplorationSystem worldExplorationSystem;
     private RenderingSystem renderingSystem;
 
     private AmbientSoundSystem ambientSoundSystem;
-
-    private WorldStateService worldStateService;
 
     public void start() {
         initializeWindow();
@@ -185,25 +180,27 @@ public class GameEngine implements GLEventListener {
         WeatherState weatherState = new WeatherState(new FogState(fogSprite), true);
 
         GameStateService gameStateService = new GameStateService(gameState);
-        worldStateService = new WorldStateService(worldState);
+        WorldStateService worldStateService = new WorldStateService(worldState);
         EventStateService eventStateService = new EventStateService(eventState);
         WeatherStateService weatherStateService = new WeatherStateService(weatherState);
+        InteractionPolicyService interactionPolicyService = new InteractionPolicyService(gameStateService, worldStateService);
+        WorldExplorationService explorationService = new WorldExplorationService(worldStateService);
 
         commandBus = new CommandBus();
         eventBus = new EventBus();
 
-        gameStateSystem = new GameStateSystem(gameStateService, commandBus, eventBus);
+        GameStateSystem gameStateSystem = new GameStateSystem(gameStateService, commandBus, eventBus);
         endingSequenceSystem = new EndingSequenceSystem(gameStateService);
         new EventStateSystem(eventState, eventBus);
         inputSystem = new InputSystem(commandBus);
         cameraSystem = new CameraSystem(camera, player);
-        interactionSystem = new InteractionSystem(commandBus, eventBus, worldStateService);
-        noteSystem = new NoteSystem(commandBus, worldStateService);
-        questSystem = new QuestSystem(commandBus, eventBus);
-        dialogueBoxSystem = new DialogueBoxSystem(dialogueBox, commandBus);
-        worldSystem = new WorldStateSystem(worldState, eventBus);
+        new InteractionSystem(commandBus, eventBus, worldStateService, interactionPolicyService, explorationService);
+        new NoteSystem(commandBus, worldStateService);
+        new QuestSystem(commandBus, worldStateService, eventBus);
+        new DialogueBoxSystem(dialogueBox, worldStateService, commandBus);
+        new WorldStateSystem(worldState, eventBus);
         weatherStateSystem = new WeatherStateSystem(weatherStateService, eventBus);
-
+        worldExplorationSystem = new WorldExplorationSystem(gameStateService, worldStateService, eventBus);
 
         ambientSoundSystem = new AmbientSoundSystem(audioManager, weatherStateService, worldStateService);
         new SoundEffectSystem(audioManager, eventBus);
@@ -242,8 +239,8 @@ public class GameEngine implements GLEventListener {
         handleGlobalInput();
         player.update();
         inputSystem.update();
-        interactionSystem.update();
         cameraSystem.update();
+        worldExplorationSystem.update();
         weatherStateSystem.update();
         ambientSoundSystem.update();
         endingSequenceSystem.update();

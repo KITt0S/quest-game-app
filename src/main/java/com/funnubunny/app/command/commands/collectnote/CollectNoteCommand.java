@@ -3,13 +3,13 @@ package com.funnubunny.app.command.commands.collectnote;
 import com.funnubunny.app.command.commands.GameCommand;
 
 public class CollectNoteCommand implements GameCommand {
-    private final String id;
+    private final long id;
 
-    public CollectNoteCommand(String id) {
+    public CollectNoteCommand(long id) {
         this.id = id;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 }

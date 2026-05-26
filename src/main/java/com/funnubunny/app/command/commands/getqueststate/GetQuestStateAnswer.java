@@ -1,7 +1,7 @@
 package com.funnubunny.app.command.commands.getqueststate;
 
 import com.funnubunny.app.command.commands.GameAnswer;
-import com.funnubunny.app.quest.QuestState;
+import com.funnubunny.app.state.QuestState;
 
 public class GetQuestStateAnswer implements GameAnswer {
     private final QuestState questState;

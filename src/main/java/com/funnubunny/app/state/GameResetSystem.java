@@ -4,7 +4,6 @@ import com.funnubunny.app.command.CommandBus;
 import com.funnubunny.app.command.ResetGameCommand;
 import com.funnubunny.app.command.commands.GameAnswer;
 import com.funnubunny.app.command.commands.VoidAnswer;
-import com.funnubunny.app.quest.QuestState;
 import com.funnubunny.app.sound.AmbientSoundSystem;
 
 public class GameResetSystem {

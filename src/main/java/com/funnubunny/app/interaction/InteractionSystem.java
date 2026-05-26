@@ -7,134 +7,72 @@ import com.funnubunny.app.command.commands.destroylighthouse.DestroyLighthouseCo
 import com.funnubunny.app.command.commands.getqueststate.GetQuestStateAnswer;
 import com.funnubunny.app.command.commands.getqueststate.GetQuestStateCommand;
 import com.funnubunny.app.command.commands.interaction.InteractionCommand;
-import com.funnubunny.app.command.commands.isactivedialoguebox.IsActiveDialogueBoxAnswer;
-import com.funnubunny.app.command.commands.isactivedialoguebox.IsActiveDialogueBoxCommand;
-import com.funnubunny.app.command.commands.isenoughclues.IsEnoughCluesAnswer;
-import com.funnubunny.app.command.commands.isenoughclues.IsEnoughCluesCommand;
 import com.funnubunny.app.command.commands.relightlighthouse.RelightLighthouseCommand;
-import com.funnubunny.app.command.commands.showdialogue.ShowDialogueCommand;
-import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.event.*;
 import com.funnubunny.app.event.events.*;
 import com.funnubunny.app.note.Note;
-import com.funnubunny.app.quest.QuestState;
+import com.funnubunny.app.state.QuestState;
 import com.funnubunny.app.world.Lighthouse;
 import com.funnubunny.app.state.WorldStateService;
+import com.funnubunny.app.world.WorldExplorationService;
+
+import java.util.Optional;
 
 public class InteractionSystem {
     private final CommandBus commandBus;
     private final EventBus eventBus;
     private final WorldStateService worldStateService;
+    private final InteractionPolicyService policyService;
+    private final WorldExplorationService explorationService;
 
     private static final float INTERACTION_DISTANCE = 80f;
 
     public InteractionSystem(
             CommandBus commandBus,
             EventBus eventBus,
-            WorldStateService worldStateService) {
+            WorldStateService worldStateService,
+            InteractionPolicyService interactionPolicyService,
+            WorldExplorationService explorationService) {
         this.eventBus = eventBus;
         this.commandBus = commandBus;
         this.worldStateService = worldStateService;
+        this.policyService = interactionPolicyService;
+        this.explorationService = explorationService;
         commandBus.register(InteractionCommand.class, this::handle);
         commandBus.register(RelightLighthouseCommand.class, this::relightLighthouse);
         commandBus.register(DestroyLighthouseCommand.class, this::destroyLighthouse);
     }
 
-    public void update() {
-        handleReachLighthouseInteraction();
-    }
-
     private void handleNpcInteraction() {
-        if (((GetQuestStateAnswer) commandBus.dispatch(new GetQuestStateCommand())).getQuestState() != QuestState.NOT_STARTED) {
+        Optional<Long> optionalNpcId = explorationService.getNearestNpcId();
+
+        if (optionalNpcId.isEmpty()) {
             return;
         }
 
-        Player player = worldStateService.getPlayer();
-        NPC npc = worldStateService.getNpc();
+        long npcId = optionalNpcId.get();
 
-        float distance = player.getPosition().distance(npc.getPosition());
-
-        boolean canInteract = distance < INTERACTION_DISTANCE;
-
-        if (canInteract) {
-
-            IsActiveDialogueBoxAnswer isActiveDialogueBoxAnswer = commandBus.dispatch(new IsActiveDialogueBoxCommand());
-            if (!isActiveDialogueBoxAnswer.isActive()) {
-
-                commandBus.dispatch(new ShowDialogueCommand(npc.getDialogue()));
-
-                eventBus.emit(new TalkedToNpcEvent());
-            }
+        if (policyService.canInteractWithNpc(npcId)) {
+            commandBus.dispatch(new InteractWithNpcCommand(npcId));
+            eventBus.emit(new InteractedWithNpcEvent(npcId));
         }
     }
 
-    private void handleFirstNoteInteraction() {
-        if (((GetQuestStateAnswer) commandBus.dispatch(new GetQuestStateCommand())).getQuestState() != QuestState.TALKED_TO_KEEPER) {
+    private void handleNoteCollection() {
+        Optional<Long> optionalNoteId = explorationService.getNearestNoteId();
+
+        if (optionalNoteId.isEmpty()) {
             return;
         }
 
-        Player player = worldStateService.getPlayer();
+        long noteId = optionalNoteId.get();
 
-        for (Note note : worldStateService.getNotes()) {
-            float distance = player.getPosition().distance(note.getPosition());
-
-            if (distance < INTERACTION_DISTANCE) {
-                commandBus.dispatch(new CollectNoteCommand(note.getId()));
-                eventBus.emit(new FirstNoteCollectedGameEvent());
-                eventBus.emit(new NoteCollectedEvent(note.getText()));
-            }
+        if (policyService.canCollectNote(noteId)) {
+            commandBus.dispatch(new CollectNoteCommand(noteId));
+            Note note = worldStateService.getNoteById(noteId);
+            eventBus.emit(new CollectedNoteEvent(noteId, note.getText()));
         }
-    }
-
-    private void handleNoteInteraction() {
-        QuestState questState = ((GetQuestStateAnswer) commandBus.dispatch(new GetQuestStateCommand())).getQuestState();
-        if (questState != QuestState.TALKED_TO_KEEPER && questState != QuestState.FOUND_FIRST_NOTE) {
-            return;
-        }
-
-        Player player = worldStateService.getPlayer();
-
-        for (Note note : worldStateService.getNotes()) {
-
-            if (note.isCollected()) {
-                continue;
-            }
-
-            float distance = player.getPosition().distance(note.getPosition());
-
-            if (distance < INTERACTION_DISTANCE) {
-
-                commandBus.dispatch(new CollectNoteCommand(note.getId()));
-                eventBus.emit(new NoteCollectedEvent(note.getText()));
-
-                IsEnoughCluesAnswer isEnoughCluesAnswer = commandBus.dispatch(new IsEnoughCluesCommand());
-
-                if (isEnoughCluesAnswer.isEnoughClues()) {
-                    eventBus.emit(new AllNotesFoundGameEvent());
-                }
-            }
-        }
-    }
-
-    private void handleReachLighthouseInteraction() {
-        GetQuestStateAnswer getQuestStateAnswer = commandBus.dispatch(new GetQuestStateCommand());
-        if (getQuestStateAnswer.getQuestState() != QuestState.FOUND_ALL_NOTES) {
-            return;
-        }
-
-        Player player = worldStateService.getPlayer();
-        Lighthouse lighthouse = worldStateService.getLighthouse();
-
-        float distance = player.getPosition().distance(lighthouse.getPosition());
-
-        boolean nearLighthouse = distance < INTERACTION_DISTANCE;
-
-        if (!nearLighthouse) {
-            return;
-        }
-
-        eventBus.emit(new ReachedLighthouseEvent());
     }
 
     private void handleRelightLighthouse() {
@@ -159,8 +97,7 @@ public class InteractionSystem {
 
     public GameAnswer handle(InteractionCommand command) {
         handleNpcInteraction();
-        handleFirstNoteInteraction();
-        handleNoteInteraction();
+        handleNoteCollection();
         return new VoidAnswer();
     }
 

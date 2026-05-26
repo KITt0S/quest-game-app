@@ -8,9 +8,6 @@ import com.funnubunny.app.command.commands.getqueststate.GetQuestStateAnswer;
 import com.funnubunny.app.command.commands.getqueststate.GetQuestStateCommand;
 import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.event.events.QuestStateChangedEvent;
-import com.funnubunny.app.quest.QuestState;
-
-import java.util.List;
 
 public class GameStateSystem {
     private final GameStateService gameStateService;

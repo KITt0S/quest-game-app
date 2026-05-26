@@ -1,7 +1,6 @@
 package com.funnubunny.app.state;
 
 import com.funnubunny.app.core.Time;
-import com.funnubunny.app.quest.QuestState;
 
 import java.util.List;
 
@@ -26,11 +25,9 @@ public class EndingSequenceSystem {
 
         endingTimer += Time.getDeltaTime();
 
-        if (endingTimer >= 8f) {
+        if (endingTimer >= 15f) {
 
-            gameStateService.setEngineState(
-                    EngineState.ENDING
-            );
+            gameStateService.setEngineState(EngineState.ENDING);
 
             endingTimer = 0f;
         }

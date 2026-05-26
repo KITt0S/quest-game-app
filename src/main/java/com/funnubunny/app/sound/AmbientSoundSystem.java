@@ -2,7 +2,6 @@ package com.funnubunny.app.sound;
 
 import com.funnubunny.app.audio.AudioManager;
 import com.funnubunny.app.core.Time;
-import com.funnubunny.app.quest.QuestState;
 import com.funnubunny.app.state.*;
 
 public class AmbientSoundSystem {

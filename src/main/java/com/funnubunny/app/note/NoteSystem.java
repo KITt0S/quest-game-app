@@ -18,7 +18,7 @@ public class NoteSystem {
     }
 
     private GameAnswer collectNote(CollectNoteCommand command) {
-        String noteId = command.getId();
+        long noteId = command.getId();
 
         Note note = worldStateService.getNoteById(noteId);
 

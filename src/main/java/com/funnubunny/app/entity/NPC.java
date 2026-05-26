@@ -3,6 +3,9 @@ package com.funnubunny.app.entity;
 import com.funnubunny.app.quest.Dialogue;
 import org.joml.Vector2f;
 
+import java.util.Random;
+import java.util.UUID;
+
 public class NPC extends Entity {
     private final String name;
     private final Dialogue dialogue;
@@ -23,9 +26,5 @@ public class NPC extends Entity {
 
     public Dialogue getDialogue() {
         return dialogue;
-    }
-
-    public Vector2f getPosition() {
-        return transform.getPosition();
     }
 }

@@ -1,0 +1,30 @@
+package com.funnubunny.app.interaction;
+
+import com.funnubunny.app.note.Note;
+import com.funnubunny.app.state.QuestState;
+import com.funnubunny.app.state.GameStateService;
+import com.funnubunny.app.state.WorldStateService;
+
+public class InteractionPolicyService {
+    private final GameStateService gameStateService;
+    private final WorldStateService worldStateService;
+
+    public InteractionPolicyService(GameStateService gameStateService, WorldStateService worldStateService) {
+        this.gameStateService = gameStateService;
+        this.worldStateService = worldStateService;
+    }
+
+    public boolean canInteractWithNpc(long npcId) {
+        return gameStateService.getQuestState() == QuestState.NOT_STARTED;
+    }
+
+    public boolean canCollectNote(long noteId) {
+        if (gameStateService.getQuestState() != QuestState.TALKED_TO_KEEPER && gameStateService.getQuestState() != QuestState.FOUND_FIRST_NOTE) {
+            return false;
+        }
+
+        Note note = worldStateService.getNoteById(noteId);
+
+        return !note.isCollected();
+    }
+}

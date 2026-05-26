@@ -1,7 +1,6 @@
 package com.funnubunny.app.sound;
 
 import com.funnubunny.app.audio.AudioManager;
-import com.funnubunny.app.core.Time;
 import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.event.events.*;
 
@@ -11,15 +10,15 @@ public class SoundEffectSystem {
 
     public SoundEffectSystem(AudioManager audioManager, EventBus eventBus) {
         this.audioManager = audioManager;
-        eventBus.register(NoteCollectedEvent.class, this::onNoteCollected);
-        eventBus.register(TalkedToNpcEvent.class, this::onTalkedWithNpc);
+        eventBus.register(CollectedNoteEvent.class, this::onNoteCollected);
+        eventBus.register(InteractedWithNpcEvent.class, this::onTalkedWithNpc);
     }
 
-    private void onNoteCollected(NoteCollectedEvent event) {
+    private void onNoteCollected(CollectedNoteEvent event) {
         audioManager.play("note");
     }
 
-    private  void onTalkedWithNpc(TalkedToNpcEvent event) {
+    private  void onTalkedWithNpc(InteractedWithNpcEvent event) {
         audioManager.play("lightkeeper");
     }
 }

@@ -1,11 +1,10 @@
 package com.funnubunny.app.render.renderers;
 
 import com.funnubunny.app.graphics.text.TextRenderer;
-import com.funnubunny.app.quest.QuestState;
+import com.funnubunny.app.state.QuestState;
 import com.funnubunny.app.render.RenderContext;
 import com.funnubunny.app.state.EngineState;
 import com.funnubunny.app.state.GameStateService;
-import com.funnubunny.app.state.WeatherStateService;
 
 import java.util.List;
 

@@ -6,8 +6,6 @@ import org.joml.Vector2f;
 import java.util.UUID;
 
 public class Note extends Entity {
-    private final String id = UUID.randomUUID().toString();
-
     private final String text;
 
     private boolean collected = false;
@@ -15,10 +13,6 @@ public class Note extends Entity {
     public Note(String text) {
         this.text = text;
         setSize(20, 20);
-    }
-
-    public String getId() {
-        return id;
     }
 
     public boolean isCollected() {

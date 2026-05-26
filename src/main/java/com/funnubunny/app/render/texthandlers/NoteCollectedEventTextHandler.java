@@ -1,11 +1,12 @@
 package com.funnubunny.app.render.texthandlers;
 
-import com.funnubunny.app.event.events.NoteCollectedEvent;
+import com.funnubunny.app.event.events.CollectedNoteEvent;
+import com.funnubunny.app.state.WorldStateService;
 
-public class NoteCollectedEventTextHandler implements EventTextHandler<NoteCollectedEvent> {
+public class NoteCollectedEventTextHandler implements EventTextHandler<CollectedNoteEvent> {
 
     @Override
-    public String getText(NoteCollectedEvent event) {
-        return event.getNoteText();
+    public String getText(CollectedNoteEvent event) {
+        return event.getText();
     }
 }

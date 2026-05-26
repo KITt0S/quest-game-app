@@ -1,4 +1,4 @@
-package com.funnubunny.app.quest;
+package com.funnubunny.app.state;
 
 public enum QuestState {
     NOT_STARTED,

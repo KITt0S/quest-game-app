@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class EventTextHandlerFactory {
     private static final Map<Class<? extends GameEvent>, EventTextHandler<? extends GameEvent>> handlers = Map.ofEntries(
-            Map.entry(NoteCollectedEvent.class, new NoteCollectedEventTextHandler()),
+            Map.entry(CollectedNoteEvent.class, new NoteCollectedEventTextHandler()),
             Map.entry(ReachedLighthouseEvent.class, new ReachedLighthouseEventTextHandler()),
             Map.entry(RelightedLighthouseEvent.class, new RelightedLighthouseEventTextHandler()),
             Map.entry(DestroyedLighthouseEvent.class, new DestroyedLighthouseEventTextHandler()),

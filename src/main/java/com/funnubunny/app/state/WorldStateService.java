@@ -37,8 +37,8 @@ public class WorldStateService {
         return worldState.getIslandScene();
     }
 
-    public Note getNoteById(String id) {
-        return worldState.getNotes().stream().filter(note -> note.getId().equals(id)).findFirst().orElse(null);
+    public Note getNoteById(long id) {
+        return worldState.getNotes().stream().filter(note -> note.getId() == id).findFirst().orElse(null);
     }
 
     public boolean isBellRinging() {

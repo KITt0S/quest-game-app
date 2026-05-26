@@ -1,7 +1,7 @@
 package com.funnubunny.app.command.commands.changequeststate;
 
 import com.funnubunny.app.command.commands.GameCommand;
-import com.funnubunny.app.quest.QuestState;
+import com.funnubunny.app.state.QuestState;
 
 public class ChangeQuestStateCommand implements GameCommand {
     private final QuestState questState;

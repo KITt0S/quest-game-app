@@ -1,7 +1,5 @@
 package com.funnubunny.app.state;
 
-import com.funnubunny.app.quest.QuestState;
-
 public class GameStateService {
     private final GameState gameState;
 
