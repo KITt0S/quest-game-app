@@ -24,7 +24,7 @@ public class WorldExplorationSystem {
     }
 
     private void handleReachLighthouse() {
-        if (gameStateService.getQuestState() != QuestState.FOUND_ALL_NOTES) {
+        if (gameStateService.getQuestState() != QuestState.RESTORED_GENERATOR) {
             return;
         }
 

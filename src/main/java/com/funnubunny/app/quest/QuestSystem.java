@@ -19,6 +19,7 @@ public class QuestSystem {
         eventBus.register(CollectedNoteEvent.class, this::onCollectedNote);
         eventBus.register(FirstNoteCollectedGameEvent.class, this::onFirstNoteCollected);
         eventBus.register(AllNotesFoundGameEvent.class, this::onAllNotesFound);
+        eventBus.register(RestoredGeneratorEvent.class, this::onRestoredGenerator);
         eventBus.register(ReachedLighthouseEvent.class, this::onReachedLighthouse);
         eventBus.register(RelightedLighthouseEvent.class, this::onRelightedLighthouse);
         eventBus.register(DestroyedLighthouseEvent.class, this::onDestroyedLightouse);
@@ -37,6 +38,10 @@ public class QuestSystem {
         if (allNotesCollected) {
             commandBus.dispatch(new ChangeQuestStateCommand(QuestState.FOUND_ALL_NOTES));
         }
+    }
+
+    private void onRestoredGenerator(RestoredGeneratorEvent event) {
+        commandBus.dispatch(new ChangeQuestStateCommand(QuestState.RESTORED_GENERATOR));
     }
 
     public void onInteractedWithNpc(InteractedWithNpcEvent event) {
