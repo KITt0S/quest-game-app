@@ -39,18 +39,6 @@ public class IslandScene {
                 .affectedByLight(false)
                 .build();
 
-        WorldObject generatorRuins = WorldObject
-                .builder()
-                .x(0)
-                .y(40)
-                .width(150)
-                .height(120)
-                .r(0.28f)
-                .g(0.28f)
-                .b(0.3f)
-                .affectedByLight(true)
-                .build();
-
         WorldObject leftTrees = WorldObject
                 .builder()
                 .x(-260)
@@ -75,12 +63,12 @@ public class IslandScene {
                 .affectedByLight(true)
                 .build();
 
-        worldObjects.addAll(List.of(islandGround, dock, generatorRuins, leftTrees, rightTrees));
+        worldObjects.addAll(List.of(islandGround, dock, leftTrees, rightTrees));
     }
 
     public void setTreesSprite(Sprite sprite) {
+        worldObjects.get(2).setSprite(sprite);
         worldObjects.get(3).setSprite(sprite);
-        worldObjects.get(4).setSprite(sprite);
     }
 
     public List<WorldObject> getWorldObjects() {

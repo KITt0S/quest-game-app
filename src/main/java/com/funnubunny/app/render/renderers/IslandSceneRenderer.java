@@ -36,7 +36,7 @@ public class IslandSceneRenderer extends Renderer {
         for (int i = 0; i < worldObjects.size(); i++) {
             WorldObject worldObject = worldObjects.get(i);
 
-            if (i != 3 && i != 4) {
+            if (i != 2 && i != 3) {
                 shader.use(gl);
                 shader.setUniformMatrix4f(gl, "uProjectionView", context.getCamera().getProjectionView());
                 shader.setUniformVec2(gl, "uPosition", worldObject.getTransform().getPosition().x, worldObject.getTransform().getPosition().y);

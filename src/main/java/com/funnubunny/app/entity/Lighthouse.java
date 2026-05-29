@@ -1,4 +1,4 @@
-package com.funnubunny.app.world;
+package com.funnubunny.app.entity;
 
 import com.funnubunny.app.entity.Entity;
 import com.funnubunny.app.graphics.Sprite;

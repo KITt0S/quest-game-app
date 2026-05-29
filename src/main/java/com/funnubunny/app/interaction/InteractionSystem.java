@@ -4,16 +4,15 @@ import com.funnubunny.app.command.*;
 import com.funnubunny.app.command.commands.*;
 import com.funnubunny.app.command.commands.collectnote.CollectNoteCommand;
 import com.funnubunny.app.command.commands.destroylighthouse.DestroyLighthouseCommand;
+import com.funnubunny.app.command.commands.fixgenerator.RestoreGeneratorCommand;
 import com.funnubunny.app.command.commands.getqueststate.GetQuestStateAnswer;
 import com.funnubunny.app.command.commands.getqueststate.GetQuestStateCommand;
 import com.funnubunny.app.command.commands.interaction.InteractionCommand;
 import com.funnubunny.app.command.commands.relightlighthouse.RelightLighthouseCommand;
-import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.event.*;
 import com.funnubunny.app.event.events.*;
 import com.funnubunny.app.note.Note;
 import com.funnubunny.app.state.QuestState;
-import com.funnubunny.app.world.Lighthouse;
 import com.funnubunny.app.state.WorldStateService;
 import com.funnubunny.app.world.WorldExplorationService;
 
@@ -40,8 +39,15 @@ public class InteractionSystem {
         this.policyService = interactionPolicyService;
         this.explorationService = explorationService;
         commandBus.register(InteractionCommand.class, this::handle);
-        commandBus.register(RelightLighthouseCommand.class, this::relightLighthouse);
-        commandBus.register(DestroyLighthouseCommand.class, this::destroyLighthouse);
+        commandBus.register(RelightLighthouseCommand.class, this::handleRelightLighthouse);
+        commandBus.register(DestroyLighthouseCommand.class, this::handleDestroyLighthouse);
+    }
+
+    public GameAnswer handle(InteractionCommand command) {
+        handleNpcInteraction();
+        handleNoteCollection();
+        handleRestoreGenerator();
+        return new VoidAnswer();
     }
 
     private void handleNpcInteraction() {
@@ -75,39 +81,36 @@ public class InteractionSystem {
         }
     }
 
-    private void handleRelightLighthouse() {
-        GetQuestStateAnswer getQuestStateAnswer = commandBus.dispatch(new GetQuestStateCommand());
-        if (getQuestStateAnswer.getQuestState() != QuestState.REACHED_LIGHTHOUSE) {
+    private void handleRestoreGenerator() {
+        if (!policyService.canInteractWithGenerator()) {
             return;
         }
 
-        eventBus.emit(new RelightedLighthouseEvent());
-    }
-
-    private void handleDestroyLighthouse() {
-        GetQuestStateAnswer getQuestStateAnswer = commandBus.dispatch(new GetQuestStateCommand());
-        if (getQuestStateAnswer.getQuestState() != QuestState.REACHED_LIGHTHOUSE) {
+        if (!explorationService.isNearOfGenerator()){
             return;
         }
 
-        System.out.println("Lighthouse is destroyed");
-
-        eventBus.emit(new DestroyedLighthouseEvent());
+        commandBus.dispatch(new RestoreGeneratorCommand());
+        eventBus.emit(new RestoredGeneratorEvent());
     }
 
-    public GameAnswer handle(InteractionCommand command) {
-        handleNpcInteraction();
-        handleNoteCollection();
+    private GameAnswer handleRelightLighthouse(RelightLighthouseCommand command) {
+        GetQuestStateAnswer getQuestStateAnswer = commandBus.dispatch(new GetQuestStateCommand());
+        if (getQuestStateAnswer.getQuestState() == QuestState.REACHED_LIGHTHOUSE) {
+            eventBus.emit(new RelightedLighthouseEvent());
+        }
+
         return new VoidAnswer();
     }
 
-    private GameAnswer relightLighthouse(RelightLighthouseCommand command) {
-        handleRelightLighthouse();
+    private GameAnswer handleDestroyLighthouse(DestroyLighthouseCommand command) {
+        GetQuestStateAnswer getQuestStateAnswer = commandBus.dispatch(new GetQuestStateCommand());
+        if (getQuestStateAnswer.getQuestState() == QuestState.REACHED_LIGHTHOUSE) {
+            System.out.println("Lighthouse is destroyed");
+            eventBus.emit(new DestroyedLighthouseEvent());
+        }
+
         return new VoidAnswer();
     }
 
-    private GameAnswer destroyLighthouse(DestroyLighthouseCommand command) {
-        handleDestroyLighthouse();
-        return new VoidAnswer();
-    }
 }

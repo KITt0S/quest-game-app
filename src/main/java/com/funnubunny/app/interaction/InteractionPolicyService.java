@@ -27,4 +27,12 @@ public class InteractionPolicyService {
 
         return !note.isCollected();
     }
+
+    public boolean canInteractWithGenerator() {
+        if (gameStateService.getQuestState() != QuestState.FOUND_ALL_NOTES) {
+            return false;
+        }
+
+        return true;
+    }
 }

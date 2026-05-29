@@ -1,5 +1,6 @@
 package com.funnubunny.app.world;
 
+import com.funnubunny.app.entity.Lighthouse;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.event.events.ReachedLighthouseEvent;

@@ -1,5 +1,6 @@
 package com.funnubunny.app.world;
 
+import com.funnubunny.app.entity.Generator;
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.note.Note;
@@ -49,5 +50,12 @@ public class WorldExplorationService {
                 })
                 .map(Note::getId)
                 .findFirst();
+    }
+
+    public boolean isNearOfGenerator() {
+        Player player = worldStateService.getPlayer();
+        Generator generator = worldStateService.getGenerator();
+
+        return player.getPosition().distance(generator.getPosition()) < WorldExplorationConstants.INTERACTION_DISTANCE;
     }
 }

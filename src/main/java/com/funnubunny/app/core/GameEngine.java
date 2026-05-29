@@ -4,6 +4,8 @@ import com.funnubunny.app.audio.AudioManager;
 import com.funnubunny.app.command.CommandBus;
 import com.funnubunny.app.dialoguebox.DialogueBox;
 import com.funnubunny.app.dialoguebox.DialogueBoxSystem;
+import com.funnubunny.app.entity.Generator;
+import com.funnubunny.app.entity.Lighthouse;
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.event.EventBus;
@@ -47,6 +49,7 @@ public class GameEngine implements GLEventListener {
     private ShaderProgram colorShader;
     private ShaderProgram spriteShader;
     private ShaderProgram fogShader;
+    private ShaderProgram generatorShader;
     private ShaderProgram lighthouseShader;
     private ShaderProgram treesShader;
     private ShaderProgram textShader;
@@ -56,7 +59,6 @@ public class GameEngine implements GLEventListener {
     private Player player;
     private NPC npc;
     private IslandScene islandScene;
-    private Lighthouse lighthouse;
 
     private GameState gameState;
 
@@ -112,6 +114,7 @@ public class GameEngine implements GLEventListener {
         colorShader = new ShaderProgram(gl, "/shaders/color.vert", "/shaders/color.frag");
         spriteShader = new ShaderProgram(gl, "/shaders/sprite.vert", "/shaders/sprite.frag");
         fogShader = new ShaderProgram(gl, "/shaders/fog.vert", "/shaders/fog.frag");
+        generatorShader = new ShaderProgram(gl, "/shaders/generator.vert", "/shaders/generator.frag");
         lighthouseShader = new ShaderProgram(gl, "/shaders/lighthouse.vert", "/shaders/lighthouse.frag");
         treesShader = new ShaderProgram(gl, "/shaders/trees.vert", "/shaders/trees.frag");
         textShader = new ShaderProgram(gl, "/shaders/text.vert", "/shaders/text.frag");
@@ -139,8 +142,14 @@ public class GameEngine implements GLEventListener {
         Sprite inactiveSprite = new Sprite(inactiveTexture);
         Texture activeTexture = new Texture("/textures/active_lighthouse.png");
         Sprite activeSprite = new Sprite(activeTexture);
-        lighthouse = new Lighthouse();
+        Lighthouse lighthouse = new Lighthouse();
         lighthouse.setSprites(inactiveSprite, activeSprite);
+
+        Texture inactiveGeneratorTexture = new Texture("/textures/inactive_generator.png");
+        Sprite inactiveGeneratorSprite = new Sprite(inactiveGeneratorTexture);
+        Texture activeGeneratorTexture = new Texture("/textures/active_generator.png");
+        Sprite activeGeneratorSprite = new Sprite(activeGeneratorTexture);
+        Generator generator = new Generator(new Sprite[]{inactiveGeneratorSprite, activeGeneratorSprite});
 
         dialogueBox = new DialogueBox();
 
@@ -175,7 +184,7 @@ public class GameEngine implements GLEventListener {
         audioManager.load("lightkeeper", "/audio/lightkeeper.wav");
 
         gameState = new GameState();
-        WorldState worldState = new WorldState(player, npc, notes, lighthouse, islandScene);
+        WorldState worldState = new WorldState(player, npc, notes, generator, lighthouse, islandScene);
         EventState eventState = new EventState();
         WeatherState weatherState = new WeatherState(new FogState(fogSprite), true);
 
@@ -189,7 +198,7 @@ public class GameEngine implements GLEventListener {
         commandBus = new CommandBus();
         eventBus = new EventBus();
 
-        GameStateSystem gameStateSystem = new GameStateSystem(gameStateService, commandBus, eventBus);
+        new GameStateSystem(gameStateService, commandBus, eventBus);
         endingSequenceSystem = new EndingSequenceSystem(gameStateService);
         new EventStateSystem(eventState, eventBus);
         inputSystem = new InputSystem(commandBus);
@@ -198,9 +207,10 @@ public class GameEngine implements GLEventListener {
         new NoteSystem(commandBus, worldStateService);
         new QuestSystem(commandBus, worldStateService, eventBus);
         new DialogueBoxSystem(dialogueBox, worldStateService, commandBus);
-        new WorldStateSystem(worldState, eventBus);
+        new WorldStateSystem(worldState, commandBus, eventBus);
         weatherStateSystem = new WeatherStateSystem(weatherStateService, eventBus);
         worldExplorationSystem = new WorldExplorationSystem(gameStateService, worldStateService, eventBus);
+        new GeneratorBehaviourSystem(worldStateService, eventBus);
 
         ambientSoundSystem = new AmbientSoundSystem(audioManager, weatherStateService, worldStateService);
         new SoundEffectSystem(audioManager, eventBus);
@@ -218,6 +228,7 @@ public class GameEngine implements GLEventListener {
         renderingSystem.register(new EndingScreenRenderer(gameStateService, textRenderer));
         renderingSystem.register(new PlayerRenderer(gameStateService, worldStateService, spriteShader));
         renderingSystem.register(new NpcRenderer(gameStateService, worldStateService, spriteShader));
+        renderingSystem.register(new GeneratorRenderer(gameStateService, worldStateService, generatorShader));
         renderingSystem.register(new LighthouseRenderer(gameStateService, worldStateService, lighthouseShader));
         renderingSystem.register(new NoteRenderer(gameStateService, worldStateService, spriteShader));
         renderingSystem.register(new IslandSceneRenderer(gameStateService, worldStateService, colorShader, treesShader));
@@ -284,6 +295,10 @@ public class GameEngine implements GLEventListener {
 
         if (spriteShader != null) {
             spriteShader.delete(gl);
+        }
+
+        if (generatorShader != null) {
+            generatorShader.delete(gl);
         }
 
         if (lighthouseShader != null) {

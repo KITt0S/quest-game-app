@@ -1,11 +1,11 @@
 package com.funnubunny.app.state;
 
+import com.funnubunny.app.entity.Generator;
 import com.funnubunny.app.entity.NPC;
 import com.funnubunny.app.entity.Player;
 import com.funnubunny.app.note.Note;
-import com.funnubunny.app.world.Fog;
 import com.funnubunny.app.world.IslandScene;
-import com.funnubunny.app.world.Lighthouse;
+import com.funnubunny.app.entity.Lighthouse;
 
 import java.util.List;
 
@@ -23,6 +23,10 @@ public class WorldStateService {
 
     public NPC getNpc() {
         return worldState.getNpc();
+    }
+
+    public Generator getGenerator() {
+        return worldState.getGenerator();
     }
 
     public Lighthouse getLighthouse() {
