@@ -56,17 +56,6 @@ public class GameEngine implements GLEventListener {
 
     private Camera2D camera;
 
-    private Player player;
-    private NPC npc;
-    private IslandScene islandScene;
-
-    private GameState gameState;
-
-    private DialogueBox dialogueBox;
-
-    private CommandBus commandBus;
-    private EventBus eventBus;
-
     private EndingSequenceSystem endingSequenceSystem;
     private InputSystem inputSystem;
     private CameraSystem cameraSystem;
@@ -121,10 +110,10 @@ public class GameEngine implements GLEventListener {
 
         camera = new Camera2D(WIDTH, HEIGHT);
 
-        player = new Player();
+        Player player = new Player();
         player.setSprite(new Sprite(new Texture("/textures/player.png")));
 
-        npc = new NPC("Old Keeper",
+        NPC npc = new NPC("Old Keeper",
                 new Dialogue(List.of(
                         "The lighthouse went dark...",
                         "Something is wrong in the fog.",
@@ -132,7 +121,7 @@ public class GameEngine implements GLEventListener {
         npc.setSprite(new Sprite(new Texture("/textures/old_keeper.png")));
         npc.setSize(50.0f, 50.0f);
 
-        islandScene = new IslandScene();
+        IslandScene islandScene = new IslandScene();
 
         Texture treesTexture = new Texture("/textures/trees.png");
         Sprite treesSprite = new Sprite(treesTexture);
@@ -151,7 +140,7 @@ public class GameEngine implements GLEventListener {
         Sprite activeGeneratorSprite = new Sprite(activeGeneratorTexture);
         Generator generator = new Generator(new Sprite[]{inactiveGeneratorSprite, activeGeneratorSprite});
 
-        dialogueBox = new DialogueBox();
+        DialogueBox dialogueBox = new DialogueBox();
 
         Texture fogTexture = new Texture("/textures/fog.png");
         Sprite fogSprite = new Sprite(fogTexture);
@@ -183,7 +172,7 @@ public class GameEngine implements GLEventListener {
         audioManager.load("note", "/audio/note.wav");
         audioManager.load("lightkeeper", "/audio/lightkeeper.wav");
 
-        gameState = new GameState();
+        GameState gameState = new GameState();
         WorldState worldState = new WorldState(player, npc, notes, generator, lighthouse, islandScene);
         EventState eventState = new EventState();
         WeatherState weatherState = new WeatherState(new FogState(fogSprite), true);
@@ -195,8 +184,8 @@ public class GameEngine implements GLEventListener {
         InteractionPolicyService interactionPolicyService = new InteractionPolicyService(gameStateService, worldStateService);
         WorldExplorationService explorationService = new WorldExplorationService(worldStateService);
 
-        commandBus = new CommandBus();
-        eventBus = new EventBus();
+        CommandBus commandBus = new CommandBus();
+        EventBus eventBus = new EventBus();
 
         new GameStateSystem(gameStateService, commandBus, eventBus);
         endingSequenceSystem = new EndingSequenceSystem(gameStateService);
@@ -207,7 +196,7 @@ public class GameEngine implements GLEventListener {
         new NoteSystem(commandBus, worldStateService);
         new QuestSystem(commandBus, worldStateService, eventBus);
         new DialogueBoxSystem(dialogueBox, worldStateService, commandBus);
-        new WorldStateSystem(worldState, commandBus, eventBus);
+        new WorldStateSystem(worldState, worldStateService, commandBus, eventBus);
         weatherStateSystem = new WeatherStateSystem(weatherStateService, eventBus);
         worldExplorationSystem = new WorldExplorationSystem(gameStateService, worldStateService, eventBus);
         new GeneratorBehaviourSystem(worldStateService, eventBus);
@@ -248,7 +237,6 @@ public class GameEngine implements GLEventListener {
 
     private void update() {
         handleGlobalInput();
-        player.update();
         inputSystem.update();
         cameraSystem.update();
         worldExplorationSystem.update();
@@ -311,6 +299,10 @@ public class GameEngine implements GLEventListener {
 
         if (treesShader != null) {
             treesShader.delete(gl);
+        }
+
+        if (textShader != null) {
+            textShader.delete(gl);
         }
 
         if (animator != null) {

@@ -97,6 +97,7 @@ public class InteractionSystem {
     private GameAnswer handleRelightLighthouse(RelightLighthouseCommand command) {
         GetQuestStateAnswer getQuestStateAnswer = commandBus.dispatch(new GetQuestStateCommand());
         if (getQuestStateAnswer.getQuestState() == QuestState.REACHED_LIGHTHOUSE) {
+            commandBus.dispatch(new RelightLighthouseCommand());
             eventBus.emit(new RelightedLighthouseEvent());
         }
 

@@ -12,28 +12,10 @@ public class Player extends Entity {
     public Player() {
         super();
         setSize(32f, 48f);
-        setColor(0.8f, 0.85f, 1.0f);
     }
 
-    @Override
-    public void update() {
-        float dt = Time.getDeltaTime();
-
-        if (Input.isKeyPressed(KeyEvent.VK_W)) {
-            transform.translate(0, speed * dt);
-        }
-
-        if (Input.isKeyPressed(KeyEvent.VK_S)) {
-            transform.translate(0, -speed * dt);
-        }
-
-        if (Input.isKeyPressed(KeyEvent.VK_A)) {
-            transform.translate(-speed * dt, 0);
-        }
-
-        if (Input.isKeyPressed(KeyEvent.VK_D)) {
-            transform.translate(speed * dt, 0);
-        }
+    public float getSpeed() {
+        return speed;
     }
 
     public Vector2f getPosition() {
