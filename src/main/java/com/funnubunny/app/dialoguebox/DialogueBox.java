@@ -1,40 +1,35 @@
 package com.funnubunny.app.dialoguebox;
 
-import com.funnubunny.app.quest.Dialogue;
-import lombok.Getter;
+import java.util.*;
 
-@Getter
 public class DialogueBox {
+    private final Queue<String> lines;
+    private String line;
 
-    private Dialogue dialogue;
+    public DialogueBox() {
+        this.lines = new LinkedList<>();
+    }
 
-    public void show(Dialogue dialogue) {
-        this.dialogue = dialogue;
-        dialogue.reset();
+    public void setLines(List<String> lines) {
+        reset();
+        this.lines.addAll(lines);
+        next();
     }
 
     public void next() {
-        if (dialogue == null) {
-            return;
-        }
-        
-        if (dialogue.isFinished()) {
-            hide();
-            return;
-        }
-
-        dialogue.next();
+        line = lines.poll();
     }
 
-    private void hide() {
-        dialogue = null;
+    public String getCurrentLine() {
+        return line == null ? "" : line;
+    }
+
+    public void reset() {
+        lines.clear();
+        line = null;
     }
 
     public boolean isActive() {
-        return dialogue != null;
-    }
-
-    public Dialogue getDialogue() {
-        return dialogue;
+        return line != null;
     }
 }

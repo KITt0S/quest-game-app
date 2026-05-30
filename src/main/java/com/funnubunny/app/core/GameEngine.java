@@ -3,6 +3,7 @@ package com.funnubunny.app.core;
 import com.funnubunny.app.audio.AudioManager;
 import com.funnubunny.app.command.CommandBus;
 import com.funnubunny.app.dialoguebox.DialogueBox;
+import com.funnubunny.app.dialoguebox.DialogueBoxService;
 import com.funnubunny.app.dialoguebox.DialogueBoxSystem;
 import com.funnubunny.app.entity.Generator;
 import com.funnubunny.app.entity.Lighthouse;
@@ -17,7 +18,6 @@ import com.funnubunny.app.interaction.InteractionPolicyService;
 import com.funnubunny.app.interaction.InteractionSystem;
 import com.funnubunny.app.note.Note;
 import com.funnubunny.app.note.NoteSystem;
-import com.funnubunny.app.quest.Dialogue;
 import com.funnubunny.app.quest.QuestSystem;
 import com.funnubunny.app.render.RenderContext;
 import com.funnubunny.app.render.RenderingSystem;
@@ -113,11 +113,10 @@ public class GameEngine implements GLEventListener {
         Player player = new Player();
         player.setSprite(new Sprite(new Texture("/textures/player.png")));
 
-        NPC npc = new NPC("Old Keeper",
-                new Dialogue(List.of(
-                        "The lighthouse went dark...",
-                        "Something is wrong in the fog.",
-                        "Find the power source.")));
+        NPC npc = new NPC("Old Keeper", List.of(
+                "The lighthouse went dark...",
+                "Something is wrong in the fog.",
+                "Find the power source."));
         npc.setSprite(new Sprite(new Texture("/textures/old_keeper.png")));
         npc.setSize(50.0f, 50.0f);
 
@@ -183,6 +182,7 @@ public class GameEngine implements GLEventListener {
         WeatherStateService weatherStateService = new WeatherStateService(weatherState);
         InteractionPolicyService interactionPolicyService = new InteractionPolicyService(gameStateService, worldStateService);
         WorldExplorationService explorationService = new WorldExplorationService(worldStateService);
+        DialogueBoxService dialogueBoxService = new DialogueBoxService(dialogueBox);
 
         CommandBus commandBus = new CommandBus();
         EventBus eventBus = new EventBus();
@@ -204,7 +204,7 @@ public class GameEngine implements GLEventListener {
         ambientSoundSystem = new AmbientSoundSystem(audioManager, weatherStateService, worldStateService);
         new SoundEffectSystem(audioManager, eventBus);
 
-        new GameResetSystem(gameStateService, worldStateService, weatherStateService, commandBus, ambientSoundSystem);
+        new GameResetSystem(gameStateService, worldStateService, weatherStateService, dialogueBoxService, commandBus, ambientSoundSystem);
 
         Texture fontTexture = new Texture("/textures/font.png");
         BitmapFont bitmapFont = new BitmapFont(fontTexture);

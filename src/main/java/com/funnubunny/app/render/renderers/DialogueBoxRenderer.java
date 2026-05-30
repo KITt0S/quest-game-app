@@ -27,7 +27,7 @@ public class DialogueBoxRenderer implements Renderable {
             return;
         }
 
-        textRenderer.renderText(context.getGl(), dialogueBox.getDialogue().getCurrentLine(), 0, 0);
+        textRenderer.renderText(context.getGl(), dialogueBox.getCurrentLine(), 0, 0);
     }
 
     @Override

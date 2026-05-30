@@ -17,17 +17,17 @@ public class DialogueBoxSystem {
     }
 
     private GameAnswer interactWithNpc(InteractWithNpcCommand command) {
-        if (!dialogueBox.isActive()) {
-            dialogueBox.show(worldStateService.getNpc().getDialogue());
-        }
+        dialogueBox.setLines(worldStateService.getNpc().getDialogue());
 
         return new VoidAnswer();
     }
 
     private VoidAnswer next(NextDialogueCommand command) {
-        if (dialogueBox.isActive()) {
-            dialogueBox.next();
+        if (!dialogueBox.isActive()) {
+            return new VoidAnswer();
         }
+
+        dialogueBox.next();
 
         return new VoidAnswer();
     }

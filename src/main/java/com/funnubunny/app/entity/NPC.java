@@ -1,16 +1,12 @@
 package com.funnubunny.app.entity;
 
-import com.funnubunny.app.quest.Dialogue;
-import org.joml.Vector2f;
-
-import java.util.Random;
-import java.util.UUID;
+import java.util.List;
 
 public class NPC extends Entity {
     private final String name;
-    private final Dialogue dialogue;
+    private final List<String> dialogue;
 
-    public NPC(String name, Dialogue dialogue) {
+    public NPC(String name, List<String> dialogue) {
         super();
         this.name = name;
         this.dialogue = dialogue;
@@ -24,7 +20,7 @@ public class NPC extends Entity {
 
     }
 
-    public Dialogue getDialogue() {
+    public List<String> getDialogue() {
         return dialogue;
     }
 }
