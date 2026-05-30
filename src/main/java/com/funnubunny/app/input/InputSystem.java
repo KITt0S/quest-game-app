@@ -2,14 +2,11 @@ package com.funnubunny.app.input;
 
 import com.funnubunny.app.command.*;
 import com.funnubunny.app.command.commands.changeenginestate.ChangeEngineStateCommand;
-import com.funnubunny.app.command.commands.destroylighthouse.DestroyLighthouseCommand;
 import com.funnubunny.app.command.commands.interaction.InteractionCommand;
+import com.funnubunny.app.command.commands.interaction.ChoiceInteractionCommand;
 import com.funnubunny.app.command.commands.moveplayer.MovePlayerCommand;
 import com.funnubunny.app.command.commands.nextdialogue.NextDialogueCommand;
-import com.funnubunny.app.command.commands.relightlighthouse.RelightLighthouseCommand;
 import com.funnubunny.app.core.Input;
-import com.funnubunny.app.core.Time;
-import com.funnubunny.app.state.EngineState;
 import com.jogamp.newt.event.KeyEvent;
 
 public class InputSystem {
@@ -63,13 +60,13 @@ public class InputSystem {
 
     public void pressedR() {
         if (Input.isKeyPressed(KeyEvent.VK_R)) {
-            commandBus.dispatch(new RelightLighthouseCommand());
+            commandBus.dispatch(new ChoiceInteractionCommand(ChoiceInteractionCommand.Choice.FIRST));
         }
     }
 
     public void pressedF() {
         if (Input.isKeyPressed(KeyEvent.VK_F)) {
-            commandBus.dispatch(new DestroyLighthouseCommand());
+            commandBus.dispatch(new ChoiceInteractionCommand(ChoiceInteractionCommand.Choice.SECOND));
         }
     }
 

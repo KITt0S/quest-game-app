@@ -1,17 +1,19 @@
 package com.funnubunny.app.interaction;
 
-import com.funnubunny.app.command.*;
-import com.funnubunny.app.command.commands.*;
+import com.funnubunny.app.command.CommandBus;
+import com.funnubunny.app.command.InteractWithNpcCommand;
+import com.funnubunny.app.command.commands.GameAnswer;
+import com.funnubunny.app.command.commands.VoidAnswer;
 import com.funnubunny.app.command.commands.collectnote.CollectNoteCommand;
 import com.funnubunny.app.command.commands.destroylighthouse.DestroyLighthouseCommand;
 import com.funnubunny.app.command.commands.fixgenerator.RestoreGeneratorCommand;
-import com.funnubunny.app.command.commands.getqueststate.GetQuestStateAnswer;
-import com.funnubunny.app.command.commands.getqueststate.GetQuestStateCommand;
+import com.funnubunny.app.command.commands.interaction.ChoiceInteractionCommand;
 import com.funnubunny.app.command.commands.interaction.InteractionCommand;
 import com.funnubunny.app.command.commands.relightlighthouse.RelightLighthouseCommand;
-import com.funnubunny.app.event.*;
+import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.event.events.*;
 import com.funnubunny.app.note.Note;
+import com.funnubunny.app.state.GameStateService;
 import com.funnubunny.app.state.QuestState;
 import com.funnubunny.app.state.WorldStateService;
 import com.funnubunny.app.world.WorldExplorationService;
@@ -19,31 +21,33 @@ import com.funnubunny.app.world.WorldExplorationService;
 import java.util.Optional;
 
 public class InteractionSystem {
-    private final CommandBus commandBus;
-    private final EventBus eventBus;
+    private final GameStateService gameStateService;
     private final WorldStateService worldStateService;
     private final InteractionPolicyService policyService;
     private final WorldExplorationService explorationService;
+    private final CommandBus commandBus;
+    private final EventBus eventBus;
 
     private static final float INTERACTION_DISTANCE = 80f;
 
     public InteractionSystem(
-            CommandBus commandBus,
-            EventBus eventBus,
+            GameStateService gameStateService,
             WorldStateService worldStateService,
             InteractionPolicyService interactionPolicyService,
-            WorldExplorationService explorationService) {
-        this.eventBus = eventBus;
-        this.commandBus = commandBus;
+            WorldExplorationService explorationService,
+            CommandBus commandBus,
+            EventBus eventBus) {
+        this.gameStateService = gameStateService;
         this.worldStateService = worldStateService;
         this.policyService = interactionPolicyService;
         this.explorationService = explorationService;
-        commandBus.register(InteractionCommand.class, this::handle);
-        commandBus.register(RelightLighthouseCommand.class, this::handleRelightLighthouse);
-        commandBus.register(DestroyLighthouseCommand.class, this::handleDestroyLighthouse);
+        this.eventBus = eventBus;
+        this.commandBus = commandBus;
+        commandBus.register(InteractionCommand.class, this::handleInteraction);
+        commandBus.register(ChoiceInteractionCommand.class, this::handleChoiceInteraction);
     }
 
-    public GameAnswer handle(InteractionCommand command) {
+    public GameAnswer handleInteraction(InteractionCommand command) {
         handleNpcInteraction();
         handleNoteCollection();
         handleRestoreGenerator();
@@ -94,24 +98,31 @@ public class InteractionSystem {
         eventBus.emit(new RestoredGeneratorEvent());
     }
 
-    private GameAnswer handleRelightLighthouse(RelightLighthouseCommand command) {
-        GetQuestStateAnswer getQuestStateAnswer = commandBus.dispatch(new GetQuestStateCommand());
-        if (getQuestStateAnswer.getQuestState() == QuestState.REACHED_LIGHTHOUSE) {
+    private VoidAnswer handleChoiceInteraction(ChoiceInteractionCommand command) {
+        handleInteractLighthouse(command.getOption());
+
+        return new VoidAnswer();
+    }
+
+    private void handleInteractLighthouse(ChoiceInteractionCommand.Choice choice) {
+        switch (choice) {
+            case FIRST -> handleRelightLighthouse();
+            case SECOND -> handleDestroyLighthouse();
+        }
+    }
+
+
+    private void handleRelightLighthouse() {
+        if (gameStateService.getQuestState() == QuestState.REACHED_LIGHTHOUSE) {
             commandBus.dispatch(new RelightLighthouseCommand());
             eventBus.emit(new RelightedLighthouseEvent());
         }
-
-        return new VoidAnswer();
     }
 
-    private GameAnswer handleDestroyLighthouse(DestroyLighthouseCommand command) {
-        GetQuestStateAnswer getQuestStateAnswer = commandBus.dispatch(new GetQuestStateCommand());
-        if (getQuestStateAnswer.getQuestState() == QuestState.REACHED_LIGHTHOUSE) {
-            System.out.println("Lighthouse is destroyed");
+    private void handleDestroyLighthouse() {
+        if (gameStateService.getQuestState() == QuestState.REACHED_LIGHTHOUSE) {
+            commandBus.dispatch(new DestroyLighthouseCommand());
             eventBus.emit(new DestroyedLighthouseEvent());
         }
-
-        return new VoidAnswer();
     }
-
 }

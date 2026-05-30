@@ -2,9 +2,12 @@ package com.funnubunny.app.state;
 
 import com.funnubunny.app.command.CommandBus;
 import com.funnubunny.app.command.commands.GameAnswer;
+import com.funnubunny.app.command.commands.GameCommand;
 import com.funnubunny.app.command.commands.VoidAnswer;
+import com.funnubunny.app.command.commands.destroylighthouse.DestroyLighthouseCommand;
 import com.funnubunny.app.command.commands.fixgenerator.RestoreGeneratorCommand;
 import com.funnubunny.app.command.commands.moveplayer.MovePlayerCommand;
+import com.funnubunny.app.command.commands.relightlighthouse.RelightLighthouseCommand;
 import com.funnubunny.app.core.Input;
 import com.funnubunny.app.core.Time;
 import com.funnubunny.app.entity.Generator;
@@ -18,15 +21,14 @@ public class WorldStateSystem {
     private final WorldState worldState;
     private final WorldStateService worldStateService;
 
-    public WorldStateSystem(WorldState worldState, WorldStateService worldStateService, CommandBus commandBus, EventBus eventBus) {
+    public WorldStateSystem(WorldState worldState, WorldStateService worldStateService, CommandBus commandBus) {
         this.worldState = worldState;
         this.worldStateService = worldStateService;
         commandBus.register(MovePlayerCommand.class, this::movePlayer);
         commandBus.register(RestoreGeneratorCommand.class, this::restoreGenerator);
-        eventBus.register(RelightedLighthouseEvent.class, this::onRelightedLighthouse);
-        eventBus.register(DestroyedLighthouseEvent.class, this::onDestroyedLighthouse);
+        commandBus.register(RelightLighthouseCommand.class, this::relightLighthouse);
+        commandBus.register(DestroyLighthouseCommand.class, this::destroyLighthouse);
     }
-
     private VoidAnswer movePlayer(MovePlayerCommand command) {
         Player player = worldStateService.getPlayer();
         float dt = Time.getDeltaTime();
@@ -46,11 +48,14 @@ public class WorldStateSystem {
         return new VoidAnswer();
     }
 
-    private void onRelightedLighthouse(RelightedLighthouseEvent event) {
-        worldState.getLighthouse().setActive(true);
+    private VoidAnswer destroyLighthouse(DestroyLighthouseCommand command) {
+        worldState.getLighthouse().setActive(false);
+        return new VoidAnswer();
     }
 
-    private void onDestroyedLighthouse(DestroyedLighthouseEvent event) {
-        worldState.setBellRinging(false);
+    private VoidAnswer relightLighthouse(RelightLighthouseCommand command) {
+        worldState.getLighthouse().setActive(true);
+        return new VoidAnswer();
     }
+
 }

@@ -1,11 +1,11 @@
 package com.funnubunny.app.state;
 
-import com.funnubunny.app.command.*;
-import com.funnubunny.app.command.commands.*;
+import com.funnubunny.app.command.CommandBus;
+import com.funnubunny.app.command.ResetGameCommand;
+import com.funnubunny.app.command.commands.GameAnswer;
+import com.funnubunny.app.command.commands.VoidAnswer;
 import com.funnubunny.app.command.commands.changeenginestate.ChangeEngineStateCommand;
 import com.funnubunny.app.command.commands.changequeststate.ChangeQuestStateCommand;
-import com.funnubunny.app.command.commands.getqueststate.GetQuestStateAnswer;
-import com.funnubunny.app.command.commands.getqueststate.GetQuestStateCommand;
 import com.funnubunny.app.event.EventBus;
 import com.funnubunny.app.event.events.QuestStateChangedEvent;
 
@@ -20,7 +20,6 @@ public class GameStateSystem {
         this.commandBus = commandBus;
         commandBus.register(ChangeEngineStateCommand.class, this::changeEngineState);
         commandBus.register(ChangeQuestStateCommand.class, this::changeQuestState);
-        commandBus.register(GetQuestStateCommand.class, this::getQuestState);
     }
 
     public GameAnswer changeEngineState(ChangeEngineStateCommand command) {
@@ -43,9 +42,5 @@ public class GameStateSystem {
         eventBus.emit(new QuestStateChangedEvent(command.getQuestState()));
 
         return new VoidAnswer();
-    }
-
-    public GameAnswer getQuestState(GetQuestStateCommand command) {
-        return new GetQuestStateAnswer(gameStateService.getQuestState());
     }
 }
