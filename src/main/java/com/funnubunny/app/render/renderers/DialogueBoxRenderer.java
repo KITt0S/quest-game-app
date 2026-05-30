@@ -23,7 +23,7 @@ public class DialogueBoxRenderer implements Renderable {
             return;
         }
 
-        if (!dialogueBox.isActive() || dialogueBox.getDialogue() == null) {
+        if (!dialogueBox.isActive()) {
             return;
         }
 

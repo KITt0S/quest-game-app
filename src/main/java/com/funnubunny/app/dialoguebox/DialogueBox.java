@@ -7,11 +7,9 @@ import lombok.Getter;
 public class DialogueBox {
 
     private Dialogue dialogue;
-    private boolean active = false;
 
     public void show(Dialogue dialogue) {
         this.dialogue = dialogue;
-        this.active = true;
         dialogue.reset();
     }
 
@@ -29,12 +27,11 @@ public class DialogueBox {
     }
 
     private void hide() {
-        active = false;
         dialogue = null;
     }
 
     public boolean isActive() {
-        return active;
+        return dialogue != null;
     }
 
     public Dialogue getDialogue() {

@@ -5,14 +5,17 @@ import com.funnubunny.app.command.CommandBus;
 import com.funnubunny.app.event.*;
 import com.funnubunny.app.event.events.*;
 import com.funnubunny.app.note.Note;
+import com.funnubunny.app.state.GameStateService;
 import com.funnubunny.app.state.QuestState;
 import com.funnubunny.app.state.WorldStateService;
 
 public class QuestSystem {
+    private final GameStateService gameStateService;
     private final WorldStateService worldStateService;
     private final CommandBus commandBus;
 
-    public QuestSystem(CommandBus commandBus, WorldStateService worldStateService, EventBus eventBus) {
+    public QuestSystem(GameStateService gameStateService, WorldStateService worldStateService, CommandBus commandBus, EventBus eventBus) {
+        this.gameStateService = gameStateService;
         this.worldStateService = worldStateService;
         this.commandBus = commandBus;
         eventBus.register(InteractedWithNpcEvent.class, this::onInteractedWithNpc);
@@ -45,9 +48,15 @@ public class QuestSystem {
     }
 
     public void onInteractedWithNpc(InteractedWithNpcEvent event) {
-        if (event.getNpcId() == worldStateService.getNpc().getId()) {
-            commandBus.dispatch(new ChangeQuestStateCommand(QuestState.TALKED_TO_KEEPER));
+        if(event.getNpcId() != worldStateService.getNpc().getId()) {
+            return;
         }
+
+        if (gameStateService.getQuestState() != QuestState.NOT_STARTED) {
+            return;
+        }
+
+        commandBus.dispatch(new ChangeQuestStateCommand(QuestState.TALKED_TO_KEEPER));
     }
 
     public void onFirstNoteCollected(FirstNoteCollectedGameEvent event) {

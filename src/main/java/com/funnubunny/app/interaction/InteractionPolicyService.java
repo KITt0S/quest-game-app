@@ -15,7 +15,19 @@ public class InteractionPolicyService {
     }
 
     public boolean canInteractWithNpc(long npcId) {
-        return gameStateService.getQuestState() == QuestState.NOT_STARTED;
+        if (gameStateService.getQuestState() == QuestState.NOT_STARTED) {
+            return true;
+        }
+
+        if (gameStateService.getQuestState() == QuestState.TALKED_TO_KEEPER) {
+            return true;
+        }
+
+        if (gameStateService.getQuestState() == QuestState.FOUND_FIRST_NOTE) {
+            return true;
+        }
+
+        return gameStateService.getQuestState() == QuestState.FOUND_ALL_NOTES;
     }
 
     public boolean canCollectNote(long noteId) {

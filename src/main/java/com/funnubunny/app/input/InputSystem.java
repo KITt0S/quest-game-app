@@ -55,6 +55,7 @@ public class InputSystem {
     public void pressedE() {
         if (Input.isKeyPressed(KeyEvent.VK_E)) {
             commandBus.dispatch(new InteractionCommand());
+            Input.releaseKey(KeyEvent.VK_E);
         }
     }
 

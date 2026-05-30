@@ -194,7 +194,7 @@ public class GameEngine implements GLEventListener {
         cameraSystem = new CameraSystem(camera, player);
         new InteractionSystem(gameStateService, worldStateService, interactionPolicyService, explorationService, commandBus, eventBus);
         new NoteSystem(commandBus, worldStateService);
-        new QuestSystem(commandBus, worldStateService, eventBus);
+        new QuestSystem(gameStateService, worldStateService, commandBus, eventBus);
         new DialogueBoxSystem(dialogueBox, worldStateService, commandBus);
         new WorldStateSystem(worldState, worldStateService, commandBus);
         weatherStateSystem = new WeatherStateSystem(weatherStateService, eventBus);
